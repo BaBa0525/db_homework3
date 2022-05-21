@@ -16,6 +16,6 @@
     source activate
     ```
 3. Install packages
-    ```sh
+    ```sh   
     pip install flask flask-sqlalchemy flask-marshmallow flask-cors marshmallow marshmallow-sqlalchemy
     ```
