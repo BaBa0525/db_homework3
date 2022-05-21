@@ -15,5 +15,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-# routes must be import after app is initalized
+'''
+routes must be import after app is initalized
+otherwise, it would cause error
+''' 
 from ordering import routes

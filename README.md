@@ -5,6 +5,8 @@
 
 ## Frontend
 
+We use <code>npm</code> + Vite this time.
+
 ## Backend
 
 1. Create virtual environment
