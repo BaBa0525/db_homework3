@@ -21,3 +21,19 @@ We use <code>npm</code> + Vite this time.
     ```sh   
     pip install flask flask-sqlalchemy flask-marshmallow flask-cors marshmallow marshmallow-sqlalchemy
     ```
+
+### Package Structure
+
+```
+├── ordering
+│   ├── __init__.py
+│   ├── config.py
+│   ├── models.py
+│   ├── requestRoute
+│   │   ├── __init__.py
+│   │   ├── mealRoutes.py
+│   │   ├── shopRoutes.py
+│   │   └── userRoutes.py
+│   └── schema.py
+└── run.py
+```

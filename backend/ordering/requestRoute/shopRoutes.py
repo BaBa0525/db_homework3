@@ -1,70 +1,12 @@
 from flask import request
-from random import choices
-from hashlib import sha256
+from http.client import BAD_REQUEST
 
-from ordering import app
+from ordering import app, db
 from ordering.models import User, Shop, Meal
-from ordering.schema import userSchema, shopSchema, shopListSchema, mealSchema, mealListSchema
-
-ALL_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-
-@app.route('/login', methods = ['POST'])
-def loginUser():
-    account = request.json['account']
-    password = request.json['password']
-
-    user = User.query.get(account)
-    if user is None:
-        return ({ 'message': 'The given data was invalid', 'error': 'The user does not exists.' }, 444)
-    
-    salt, password_stored = user.password.split('$')
-
-    Hasher = sha256()
-    Hasher.update(salt.encode('utf-8'))
-    Hasher.update(password.encode('utf-8'))
-    password_hashed = Hasher.hexdigest()
-
-    if password_hashed == password_stored:
-        return userSchema.jsonify(user)
-    else:
-        return ({ 'message': 'The given data was invalid', 'error': 'The password was wrong.' }, 444)
-
-
-@app.route('/register', methods = ['POST'])
-def registerUser():
-    realname = request.json['realname']
-    account = request.json['account']
-    phone = request.json['phone']
-    password = request.json['password']
-    latitude = request.json['latitude']
-    longitude = request.json['longitude']
-
-    userData = User.query.get(account)
-
-    if userData is None:
-        salt = ''.join(choices(ALL_CHARACTERS, k=8))
-        Hasher = sha256()
-        Hasher.update(salt.encode('utf-8'))
-        Hasher.update(password.encode('utf-8'))
-        password_hashed = Hasher.hexdigest()
-
-        userData = User(realname, account, phone, f'{salt}${password_hashed}', latitude, longitude)
-
-        db.session.add(userData)
-        db.session.commit()
-        return userSchema.jsonify(userData)
-    else:
-        return (userSchema.jsonify(userData), 444)
-
-
-
-@app.route('/getuser/<account>', methods = ['GET'])
-def getUser(account):
-    userData = User.query.get(account)
-    return userSchema.jsonify(userData)
+from ordering.schema import shopSchema, shopListSchema
 
 @app.route('/getshop', methods=['POST'])
-def getShop():
+def searchShopByFilters():
     shopname = request.json["shopname"]
     distance = request.json["distance"]
     pricelow = request.json["pricelow"]
@@ -73,23 +15,23 @@ def getShop():
     category = request.json["category"]
     longitude = request.json["longitude"]
     latitude = request.json["latitude"]
-    orderCond = request.json["order"]
+    orderingBy = request.json["order"]
     page = int(request.json["page"])
 
     condition = (2 if pricehigh else 0) | (1 if pricelow else 0)
     pattern = f'%{ meal }%' 
 
-    if condition == 3:
+    if condition == 0b11:
         '''
         filtered: (meal?) pricelow + pricehigh
         '''
         subQuery = Meal.query.filter(Meal.price >= pricelow, Meal.price <= pricehigh).with_entities(Shop.shopname).distinct()
-    elif condition == 2:
+    elif condition == 0b10:
         '''
         filtered: (meal?) pricehigh
         '''
         subQuery = Meal.query.filter(Meal.price <= pricehigh, Meal.name.ilike(pattern)).with_entities(Shop.shopname).distinct()
-    elif condition == 1:
+    elif condition == 0b01:
         '''
         filtered: (meal?) pricelow
         '''
@@ -129,18 +71,21 @@ def getShop():
                         Shop.shopname.ilike(f'%{ shopname }%'), 
                         Shop.category.ilike(f'%{ category }%'),
                         Shop.shopname.in_(subQuery),
+
                         func.abs( 6378.137 * ( 2 * func.asin( func.sqrt( func.pow( func.sin( (func.radians(latitude) - func.radians(Shop.latitude)) / 2 ), 2 ) + \
                         func.cos( func.radians(latitude) ) * func.cos( func.radians(Shop.latitude) ) * func.pow( func.sin( (func.radians(longitude) - func.radians(Shop.longitude)) / 2 ), 2 ) ) ) ) ) <= 8
                     ).with_entities(Shop.shopname)
 
-    if orderCond:
-        order, direction = orderCond.split('$')
-        if order == 'shopname':
+    if orderingBy:
+
+        field, direction = orderingBy.split('$')
+
+        if field == 'shopname':
             if direction == 'asc':
                 result = Shop.query.filter(Shop.shopname.in_(shopListData)).order_by(Shop.shopname.asc())
             else:
                 result = Shop.query.filter(Shop.shopname.in_(shopListData)).order_by(Shop.shopname.desc())
-        elif order == 'category':
+        elif field == 'category':
             if direction == 'asc':
                 result = Shop.query.filter(Shop.shopname.in_(shopListData)).order_by(Shop.category.asc())
             else:
@@ -161,85 +106,45 @@ def getShop():
 
     shopCount = result.count()
     shopData = result.offset(5 * (page-1)).limit(5).all()
+
     return { "shops": shopListSchema.dump(shopData), 'count': shopCount }
-    
+
 
 @app.route('/addshop', methods=['POST'])
-def addShop():
+def shopRegister():
     account = request.json["account"]
     shopname = request.json["shopname"]
     category = request.json["category"]
     latitude = request.json["latitude"]
     longitude = request.json["longitude"]
     
-    shop = Shop.query.get(shopname)
-    if shop is None:
+    if Shop.query.get(shopname) is None:
         shopData = Shop(shopname, category, latitude, longitude)
         db.session.add(shopData)
         User.query.filter(User.account == account).update({'role': "owner", 'shopname': shopname})
         db.session.commit()
         return shopSchema.jsonify(shopData)
     else:
-        return ({'message': "The shopname has been registered."}, 444)
-
-@app.route('/addmeal', methods=['POST'])
-def addMeal():
-    mealname = request.json["mealname"]
-    price = request.json["price"]
-    quantity = request.json["quantity"]
-    shopname = request.json['shopname']
-    image = request.json["image"]
-
-    mealData = Meal(mealname, shopname, image, price, quantity)
-    db.session.add(mealData)
-    db.session.commit()
-    return mealSchema.jsonify(mealData)
-  
+        return ({'message': 'The given data was invalid.', 'error': 'The shopname has been registered.'}, BAD_REQUEST)
 
 
-@app.route('/getmeal/<shopname>', methods=['GET'])
-def getMeal(shopname):
-    mealData = Meal.query.filter_by(shopname=shopname).all()
-    return mealListSchema.jsonify(mealData)
 
 @app.route('/getshop/<account>', methods=['GET'])
-def getshop(account):
-    userShop = User.query.get(account)
-    shopData = Shop.query.get(userShop.shopname)
+def getShopFromUser(account):
+    userData = User.query.get(account)
+
+    if userData is None or userData.role == 'user':
+        return ({'message': 'The given data was invalid.', 'error': 'The user is not owner yet.'}, BAD_REQUEST)
+
+    shopData = Shop.query.get(userData.shopname)
     return shopSchema.jsonify(shopData)
+
 
 @app.route('/getshopname/<shopname>', methods=['GET'])
-def getShopname(shopname):
+def getShopByShopname(shopname):
     shopData = Shop.query.get(shopname)
+
     if shopData is None: 
-        return ({'message': "The shopname has not been registered."}, 444)
-    return shopSchema.jsonify(shopData)
-
-@app.route('/deletemeal', methods=['POST'])
-def deleteMeal():
-    shopname = request.json["shopname"]
-    mealname = request.json["mealname"]
-    Meal.query.filter_by(shopname=shopname, name=mealname).delete()
-    db.session.commit()
-    return ({'message': "The meal has been deleted."}, 200)
-
-@app.route('/editmeal', methods=['POST'])
-def editMeal():
-    shopname = request.json["shopname"]
-    mealname = request.json["mealname"]
-    price = request.json["price"]
-    quantity = request.json["quantity"]
-    
-    Meal.query.filter_by(shopname=shopname, name=mealname).update({'price': price, 'quantity': quantity})
-    db.session.commit()
-    return ({'message': "The meal has been edited."}, 200)
-
-@app.route('/location', methods=['POST'])
-def updateLocation():
-    latitude = request.json["latitude"]
-    longitude = request.json["longitude"]
-    account = request.json["account"]
-    User.query.filter_by(account=account).update({'latitude': latitude, 'longitude': longitude})
-    db.session.commit()
-    userData = User.query.get(account)
-    return userSchema.jsonify(userData)
+        return ({'message': 'The given data was invalid.', 'error': 'The shopname has not been registered.'}, BAD_REQUEST)
+    else:
+        return shopSchema.jsonify(shopData)

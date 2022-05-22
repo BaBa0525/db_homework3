@@ -18,5 +18,7 @@ ma = Marshmallow(app)
 '''
 routes must be import after app is initalized
 otherwise, it would cause error
-''' 
-from ordering import routes
+'''
+from ordering.requestRoute import userRoutes
+from ordering.requestRoute import shopRoutes
+from ordering.requestRoute import mealRoutes
