@@ -19,7 +19,7 @@ We use <code>npm</code> + Vite this time.
     ```
 3. Install packages
     ```sh   
-    pip install flask flask-sqlalchemy flask-marshmallow flask-cors marshmallow marshmallow-sqlalchemy
+    pip install flask flask-sqlalchemy flask-marshmallow flask-cors marshmallow marshmallow-sqlalchemy haversine
     ```
 
 ### Package Structure

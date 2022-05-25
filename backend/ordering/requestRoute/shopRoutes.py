@@ -64,11 +64,11 @@ def searchShopByFilters():
 
     if distance:
         if distance == 'near':
-            lower_bound, upper_bound = -1, 1
+            lower_bound, upper_bound = -1, 1000
         elif distance == 'middle':
-            lower_bound, upper_bound = 1, 3
+            lower_bound, upper_bound = 1000, 3000
         else:
-            lower_bound, upper_bound = 3, 8
+            lower_bound, upper_bound = 3000, 8000
 
         subQuery = Shop.query.filter(
                         Shop.shopname.in_(subQuery),
@@ -80,7 +80,7 @@ def searchShopByFilters():
                         Shop.shopname.ilike(f'%{ shopname }%'), 
                         Shop.category.ilike(f'%{ category }%'),
                         Shop.shopname.in_(subQuery),
-                        func.distance(latitude, longitude, Shop.latitude, Shop.longitude) <= 8
+                        func.distance(latitude, longitude, Shop.latitude, Shop.longitude) <= 8000
                     ).with_entities(Shop.shopname)
 
     if orderingBy:
