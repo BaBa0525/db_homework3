@@ -19,29 +19,26 @@ def searchShopByFilters():
     orderingBy = request.json["order"]
     page = int(request.json["page"])
 
-    FILTER_PRICEHIGH = 2
-    FILTER_PRICELOW = 1
+    pattern = f'%{ meal }%'
 
-    condition = (FILTER_PRICEHIGH if pricehigh else 0) | (FILTER_PRICELOW if pricelow else 0)
-    pattern = f'%{ meal }%' 
-
-    if condition == (FILTER_PRICEHIGH | FILTER_PRICELOW):
+    if pricehigh and pricelow:
         '''
         filtered: (meal?) pricelow + pricehigh
         '''
         subQuery = Meal.query.filter(
                         Meal.price >= pricelow, 
-                        Meal.price <= pricehigh
-                    ).with_entities(Shop.shopname).distinct()
-    elif condition == FILTER_PRICEHIGH:
+                        Meal.price <= pricehigh,
+                        Meal.name.ilike(pattern)
+                    ).with_entities(Meal.shopname).distinct()
+    elif pricehigh:
         '''
         filtered: (meal?) pricehigh
         '''
         subQuery = Meal.query.filter(
                         Meal.price <= pricehigh, 
                         Meal.name.ilike(pattern)
-                    ).with_entities(Shop.shopname).distinct()
-    elif condition == FILTER_PRICELOW:
+                    ).with_entities(Meal.shopname).distinct()
+    elif pricelow:
         '''
         filtered: (meal?) pricelow
         '''
@@ -62,25 +59,21 @@ def searchShopByFilters():
         '''
         subQuery = Shop.query.with_entities(Shop.shopname)
 
-    if distance:
-        if distance == 'near':
-            lower_bound, upper_bound = -1, 1000
-        elif distance == 'middle':
-            lower_bound, upper_bound = 1000, 3000
-        else:
-            lower_bound, upper_bound = 3000, 8000
-
-        subQuery = Shop.query.filter(
-                        Shop.shopname.in_(subQuery),
-                        func.distance(latitude, longitude, Shop.latitude, Shop.longitude) > lower_bound,
-                        func.distance(latitude, longitude, Shop.latitude, Shop.longitude) <= upper_bound
-                    ).with_entities(Shop.shopname).distinct()
+    if distance is None or distance == '':
+        lower_bound, upper_bound = -1, 8000
+    if distance == 'near':
+        lower_bound, upper_bound = -1, 1000
+    elif distance == 'middle':
+        lower_bound, upper_bound = 1000, 3000
+    elif distance == 'far':
+        lower_bound, upper_bound = 3000, 8000
 
     shopListData =  Shop.query.filter(
                         Shop.shopname.ilike(f'%{ shopname }%'), 
                         Shop.category.ilike(f'%{ category }%'),
                         Shop.shopname.in_(subQuery),
-                        func.distance(latitude, longitude, Shop.latitude, Shop.longitude) <= 8000
+                        func.distance(latitude, longitude, Shop.latitude, Shop.longitude) > lower_bound,
+                        func.distance(latitude, longitude, Shop.latitude, Shop.longitude) <= upper_bound
                     ).with_entities(Shop.shopname)
 
     if orderingBy:
