@@ -25,11 +25,11 @@ We use <code>npm</code> + Vite this time.
 ### Package Structure
 
 ```
-├── ordering
+├── ordering/
 │   ├── __init__.py
 │   ├── config.py
 │   ├── models.py
-│   ├── requestRoute
+│   ├── requestRoute/
 │   │   ├── __init__.py
 │   │   ├── mealRoutes.py
 │   │   ├── shopRoutes.py
