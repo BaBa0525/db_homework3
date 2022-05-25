@@ -1,4 +1,5 @@
 from flask import request
+from sqlalchemy import func
 from http.client import BAD_REQUEST
 
 from ordering import app, db
@@ -18,36 +19,48 @@ def searchShopByFilters():
     orderingBy = request.json["order"]
     page = int(request.json["page"])
 
-    condition = (2 if pricehigh else 0) | (1 if pricelow else 0)
+    FILTER_PRICEHIGH = 2
+    FILTER_PRICELOW = 1
+
+    condition = (FILTER_PRICEHIGH if pricehigh else 0) | (FILTER_PRICELOW if pricelow else 0)
     pattern = f'%{ meal }%' 
 
-    if condition == 0b11:
+    if condition == (FILTER_PRICEHIGH | FILTER_PRICELOW):
         '''
         filtered: (meal?) pricelow + pricehigh
         '''
-        subQuery = Meal.query.filter(Meal.price >= pricelow, Meal.price <= pricehigh).with_entities(Shop.shopname).distinct()
-    elif condition == 0b10:
+        subQuery = Meal.query.filter(
+                        Meal.price >= pricelow, 
+                        Meal.price <= pricehigh
+                    ).with_entities(Shop.shopname).distinct()
+    elif condition == FILTER_PRICEHIGH:
         '''
         filtered: (meal?) pricehigh
         '''
-        subQuery = Meal.query.filter(Meal.price <= pricehigh, Meal.name.ilike(pattern)).with_entities(Shop.shopname).distinct()
-    elif condition == 0b01:
+        subQuery = Meal.query.filter(
+                        Meal.price <= pricehigh, 
+                        Meal.name.ilike(pattern)
+                    ).with_entities(Shop.shopname).distinct()
+    elif condition == FILTER_PRICELOW:
         '''
         filtered: (meal?) pricelow
         '''
-        subQuery = Meal.query.filter(Meal.price >= pricelow, Meal.name.ilike(pattern)).with_entities(Meal.shopname).distinct()
+        subQuery = Meal.query.filter(
+                        Meal.price >= pricelow, 
+                        Meal.name.ilike(pattern)
+                    ).with_entities(Meal.shopname).distinct()
     elif meal:
         '''
         filtered: meal
         '''
-        subQuery = Meal.query.filter(Meal.name.ilike(pattern)).with_entities(Meal.shopname).distinct()
+        subQuery = Meal.query.filter(
+                        Meal.name.ilike(pattern)
+                    ).with_entities(Meal.shopname).distinct()
     else:
         '''
         filtered: nothing
         '''
         subQuery = Shop.query.with_entities(Shop.shopname)
-
-    func = db.func
 
     if distance:
         if distance == 'near':
@@ -59,21 +72,15 @@ def searchShopByFilters():
 
         subQuery = Shop.query.filter(
                         Shop.shopname.in_(subQuery),
-                        
-                        func.abs( 6378.137 * ( 2 * func.asin( func.sqrt( func.pow( func.sin( (func.radians(latitude) - func.radians(Shop.latitude)) / 2 ), 2 ) + \
-                        func.cos( func.radians(latitude) ) * func.cos( func.radians(Shop.latitude) ) * func.pow( func.sin( (func.radians(longitude) - func.radians(Shop.longitude)) / 2 ), 2 ) ) ) ) ) > lower_bound,
-
-                        func.abs( 6378.137 * ( 2 * func.asin( func.sqrt( func.pow( func.sin( (func.radians(latitude) - func.radians(Shop.latitude)) / 2 ), 2 ) + \
-                        func.cos( func.radians(latitude) ) * func.cos( func.radians(Shop.latitude) ) * func.pow( func.sin( (func.radians(longitude) - func.radians(Shop.longitude)) / 2 ), 2 ) ) ) ) ) <= upper_bound
+                        func.distance(latitude, longitude, Shop.latitude, Shop.longitude) > lower_bound,
+                        func.distance(latitude, longitude, Shop.latitude, Shop.longitude) <= upper_bound
                     ).with_entities(Shop.shopname).distinct()
 
     shopListData =  Shop.query.filter(
                         Shop.shopname.ilike(f'%{ shopname }%'), 
                         Shop.category.ilike(f'%{ category }%'),
                         Shop.shopname.in_(subQuery),
-
-                        func.abs( 6378.137 * ( 2 * func.asin( func.sqrt( func.pow( func.sin( (func.radians(latitude) - func.radians(Shop.latitude)) / 2 ), 2 ) + \
-                        func.cos( func.radians(latitude) ) * func.cos( func.radians(Shop.latitude) ) * func.pow( func.sin( (func.radians(longitude) - func.radians(Shop.longitude)) / 2 ), 2 ) ) ) ) ) <= 8
+                        func.distance(latitude, longitude, Shop.latitude, Shop.longitude) <= 8
                     ).with_entities(Shop.shopname)
 
     if orderingBy:
@@ -82,25 +89,31 @@ def searchShopByFilters():
 
         if field == 'shopname':
             if direction == 'asc':
-                result = Shop.query.filter(Shop.shopname.in_(shopListData)).order_by(Shop.shopname.asc())
+                result = Shop.query.filter(
+                            Shop.shopname.in_(shopListData)
+                        ).order_by(Shop.shopname.asc())
             else:
-                result = Shop.query.filter(Shop.shopname.in_(shopListData)).order_by(Shop.shopname.desc())
+                result = Shop.query.filter(
+                            Shop.shopname.in_(shopListData)
+                        ).order_by(Shop.shopname.desc())
         elif field == 'category':
             if direction == 'asc':
-                result = Shop.query.filter(Shop.shopname.in_(shopListData)).order_by(Shop.category.asc())
+                result = Shop.query.filter(
+                            Shop.shopname.in_(shopListData)
+                        ).order_by(Shop.category.asc())
             else:
-                result = Shop.query.filter(Shop.shopname.in_(shopListData)).order_by(Shop.category.desc())
+                result = Shop.query.filter(
+                            Shop.shopname.in_(shopListData)
+                        ).order_by(Shop.category.desc())
         else:
             if direction == 'asc':
-                result = Shop.query.filter(Shop.shopname.in_(shopListData)).order_by((
-                            func.abs( 6378.137 * ( 2 * func.asin( func.sqrt( func.pow( func.sin( (func.radians(latitude) - func.radians(Shop.latitude)) / 2 ), 2 ) + \
-                            func.cos( func.radians(latitude) ) * func.cos( func.radians(Shop.latitude) ) * func.pow( func.sin( (func.radians(longitude) - func.radians(Shop.longitude)) / 2 ), 2 ) ) ) ) ) 
-                        ).asc())
+                result = Shop.query.filter(
+                            Shop.shopname.in_(shopListData)
+                        ).order_by(func.distance(latitude, longitude, Shop.latitude, Shop.longitude).asc())
             else:
-                result = Shop.query.filter(Shop.shopname.in_(shopListData)).order_by((
-                            func.abs( 6378.137 * ( 2 * func.asin( func.sqrt( func.pow( func.sin( (func.radians(latitude) - func.radians(Shop.latitude)) / 2 ), 2 ) + \
-                            func.cos( func.radians(latitude) ) * func.cos( func.radians(Shop.latitude) ) * func.pow( func.sin( (func.radians(longitude) - func.radians(Shop.longitude)) / 2 ), 2 ) ) ) ) ) 
-                        ).desc())
+                result = Shop.query.filter(
+                            Shop.shopname.in_(shopListData)
+                        ).order_by(func.distance(latitude, longitude, Shop.latitude, Shop.longitude).desc())
     else:
         result = Shop.query.filter(Shop.shopname.in_(shopListData))
 
