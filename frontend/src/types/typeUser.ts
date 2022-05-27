@@ -1,11 +1,11 @@
-type User = {
-    account?: String,
-    phone?: String,
-    password?: String,
-    realname?: String,
-    role?: 'user' | 'owner',
-    shopname?: String,
-    latitude?: number,
-    longitude?: number,
-    balance?: number
+export type User = {
+  account?: string;
+  phone?: string;
+  password?: string;
+  realname?: string;
+  role?: "user" | "owner";
+  shopname?: string;
+  latitude?: number;
+  longitude?: number;
+  balance?: number;
 };

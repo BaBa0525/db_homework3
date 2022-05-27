@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import type { User } from "@/types/typeUser";
 
 function isEmptyUser(user: User) {
   for (const _ in user) {
@@ -26,13 +27,12 @@ export const useUserStore = defineStore("user", {
     },
     async setPosition(latitude: number, longitude: number) {
       try {
-        await axios.put("http://127.0.0.1/location", {
+        await axios.put("/location", {
           account: this.user.account,
           latitude: latitude,
           longitude: longitude,
-        })
-      }
-      catch (error) {
+        });
+      } catch (error) {
         console.log(error);
         return;
       }
@@ -40,6 +40,6 @@ export const useUserStore = defineStore("user", {
       // if no error
       this.user.latitude = latitude;
       this.user.longitude = longitude;
-    }
-  }
-})
+    },
+  },
+});
