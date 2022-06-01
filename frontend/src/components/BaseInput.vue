@@ -4,7 +4,6 @@
       v-bind="$attrs"
       :value="modelValue"
       :class="inputClass"
-      :id="id"
       @input="$emit('update:modelValue', $event.target.value)"
     />
     <label :for="id" class="placeholder">
@@ -22,10 +21,6 @@
 import { computed } from "vue";
 
 const props = defineProps({
-  id: {
-    type: String,
-    default: "",
-  },
   modelValue: {
     type: String,
     default: "",
@@ -57,6 +52,7 @@ const inputClass = computed(() => {
 .input {
   position: relative;
   @include flex;
+
   input {
     border: 2px solid var(--secondary-color);
     border-radius: 8px;
@@ -67,11 +63,13 @@ const inputClass = computed(() => {
     box-sizing: border-box;
     font-size: 14px;
     transition: all 0.3s ease;
+
     &:focus,
     &:hover,
     &.filled {
       border: 2px solid var(--info-color);
     }
+
     &:focus + .placeholder span,
     &.filled + .placeholder span {
       transform: translateY(-100%);
@@ -81,6 +79,7 @@ const inputClass = computed(() => {
       border: 2px solid var(--danger-color);
     }
   }
+
   .placeholder {
     @include flex;
     position: absolute;
@@ -89,11 +88,13 @@ const inputClass = computed(() => {
     left: 12px;
     pointer-events: none;
     overflow: hidden;
+
     span {
       transition: all 0.3s ease;
       font-size: 14px;
     }
   }
+
   ul {
     color: var(--danger-color);
     list-style-type: none;

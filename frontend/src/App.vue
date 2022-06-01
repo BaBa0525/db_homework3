@@ -1,24 +1,10 @@
 <template>
   <div id="app">
     <h1>App</h1>
-    <BaseInput
-      id="account"
-      v-model.lazy="state.form.account"
-      placeholder="Account"
-      :has-error="v$.form.account.$error"
-      :errors="v$.form.account.$errors"
-      type="text"
-      @blur="v$.form.account.$touch"
-    />
-    <BaseInput
-      id="password"
-      v-model="state.form.password"
-      placeholder="Password"
-      :has-error="v$.form.password.$error"
-      :errors="v$.form.password.$errors"
-      type="password"
-      @blur="v$.form.password.$touch"
-    />
+    <BaseInput id="account" type="text" placeholder="Account" v-model.lazy="state.form.account"
+      :has-error="v$.form.account.$error" :errors="v$.form.account.$errors" @blur="v$.form.account.$touch" />
+    <BaseInput id="password" type="password" placeholder="Password" v-model="state.form.password"
+      :has-error="v$.form.password.$error" :errors="v$.form.password.$errors" @blur="v$.form.password.$touch" />
   </div>
 </template>
 
