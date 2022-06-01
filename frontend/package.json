@@ -4,8 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --port 4173",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+    "preview": "vite preview --port 4173"
   },
   "dependencies": {
     "@vuelidate/core": "^2.0.0-alpha.41",
@@ -20,10 +19,6 @@
     "@rushstack/eslint-patch": "^1.1.0",
     "@vitejs/plugin-vue": "^2.3.3",
     "@vue/eslint-config-prettier": "^7.0.0",
-    "eslint": "^8.16.0",
-    "eslint-plugin-vue": "^8.2.0",
-    "prettier": "^2.5.1",
-    "vite": "^2.9.9",
-    "vue-eslint-parser": "^9.0.2"
+    "vite": "^2.9.9"
   }
 }
