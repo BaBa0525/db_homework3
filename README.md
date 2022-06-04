@@ -8,22 +8,30 @@
 We use <code>npm</code> + Vite this time.
 
 <strong>TODOs</strong>
+
+Pages:
 - [ ] Index
     - [ ] Login Page
     - [ ] Registration Page
 - [ ] Home 
     - [ ] Navigation Sidebar
     - [ ] Search Page
-        - [ ] Menu Popup
-        - [ ] Recharge Popup
+        - [ ] Menu
+        - [ ] Recharge
     - [ ] Shop Management Page
         - [ ] Shop Registration
         - [ ] Shop Meals Editing
     - [ ] User Order Page
-        - [ ] Order Detail Popup 
+        - [ ] Order Detail
     - [ ] Shop Order Page
-        - [ ] Order Detail Popup 
+        - [ ] Order Detail
     - [ ] Transaction Page
+
+Components:
+- [x] Basic Input 
+- [ ] Popup Page
+- [ ] Sidebar Region
+- [ ] Item List
 
 ## Backend
 
