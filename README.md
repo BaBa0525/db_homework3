@@ -7,6 +7,18 @@
 
 We use <code>npm</code> + Vite this time.
 
+
+<strong>TODO</strong>
+- [ ] Index
+    - [ ] Login Page [name=Alan]
+    - [ ] Registration Page
+- [ ] Side Panel (Navigation Bar)
+- [ ] Search Page
+- [ ] Shop Management Page
+    - [ ] Shop Registration
+    - [ ] Shop Meals Editing
+- [ ] 
+
 ## Backend
 
 1. Create virtual environment
