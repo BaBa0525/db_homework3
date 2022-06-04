@@ -7,17 +7,23 @@
 
 We use <code>npm</code> + Vite this time.
 
-
-<strong>TODO</strong>
+<strong>TODOs</strong>
 - [ ] Index
-    - [ ] Login Page [name=Alan]
+    - [ ] Login Page
     - [ ] Registration Page
-- [ ] Side Panel (Navigation Bar)
-- [ ] Search Page
-- [ ] Shop Management Page
-    - [ ] Shop Registration
-    - [ ] Shop Meals Editing
-- [ ] 
+- [ ] Home 
+    - [ ] Navigation Sidebar
+    - [ ] Search Page
+        - [ ] Menu Popup
+        - [ ] Recharge Popup
+    - [ ] Shop Management Page
+        - [ ] Shop Registration
+        - [ ] Shop Meals Editing
+    - [ ] User Order Page
+        - [ ] Order Detail Popup 
+    - [ ] Shop Order Page
+        - [ ] Order Detail Popup 
+    - [ ] Transaction Page
 
 ## Backend
 
