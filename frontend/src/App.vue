@@ -1,34 +1,15 @@
 <template>
-  <div id="app">
-    <h1>App</h1>
-    <BaseInput id="account" type="text" placeholder="Account" v-model.lazy="state.form.account"
-      :has-error="v$.form.account.$error" :errors="v$.form.account.$errors" @blur="v$.form.account.$touch" />
-    <BaseInput id="password" type="password" placeholder="Password" v-model="state.form.password"
-      :has-error="v$.form.password.$error" :errors="v$.form.password.$errors" @blur="v$.form.password.$touch" />
-  </div>
+  <router-view></router-view>
 </template>
 
 <script setup>
-import { reactive } from "vue";
-import useVuelidate from "@vuelidate/core";
-import { required } from "@vuelidate/validators";
-import BaseInput from "./components/BaseInput.vue";
+import { useRouter } from 'vue-router';
+import { useUserStore } from './stores/user.js';
 
-const state = reactive({
-  form: {
-    account: "",
-    password: "",
-  },
-});
+const router = useRouter();
+const userStore = useUserStore();
 
-const rules = {
-  form: {
-    account: { required },
-    password: { required },
-  },
-};
-
-const v$ = useVuelidate(rules, state);
+router.push({ name: userStore.isLogin ? "home" : "index" });
 </script>
 
 <style lang="scss">
