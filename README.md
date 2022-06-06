@@ -29,7 +29,7 @@ Pages:
 
 Components:
 - [x] Basic Input 
-- [ ] Popup Page
+- [x] Popup Window
 - [ ] Sidebar Region
 - [ ] Item List
 
