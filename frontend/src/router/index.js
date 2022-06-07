@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import IndexView from '../view/IndexView';
+import IndexView from '../views/IndexView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,11 +8,23 @@ const router = createRouter({
       name: 'index',
       path: '/index',
       component: IndexView,
+      children: [
+        {
+          name: 'signin',
+          path: '/signin',
+          component: () => import('../views/SigninView.vue'),
+        },
+        {
+          name: 'signup',
+          path: '/signup',
+          component: () => import('../views/SignupView.vue'),
+        }
+      ]
     },
     {
       name: 'home',
       path: '/home',
-      component: () => import('../views/HomeView'),
+      component: () => import('../views/HomeView.vue'),
     }
   ]
 })
