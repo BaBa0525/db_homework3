@@ -1,12 +1,8 @@
 <template>
   <div class="input">
-    <input
-      v-bind="$attrs"
-      :value="modelValue"
-      :class="inputClass"
-      @input="$emit('update:modelValue', $event.target.value)"
-    />
-    <label :for="id" class="placeholder">
+    <input v-bind="$attrs" :value="modelValue" :class="inputClass"
+      @input="$emit('update:modelValue', $event.target.value)" />
+    <label class="placeholder">
       <span>{{ placeholder }}</span>
     </label>
     <ul v-if="hasError">
@@ -70,8 +66,8 @@ const inputClass = computed(() => {
       border: 2px solid var(--info-color);
     }
 
-    &:focus + .placeholder span,
-    &.filled + .placeholder span {
+    &:focus+.placeholder span,
+    &.filled+.placeholder span {
       transform: translateY(-100%);
     }
 
