@@ -34,6 +34,6 @@ def receive_connect(dbapi_connection, connection_record):
 routes must be import after app is initalized
 otherwise, it would cause error
 '''
-from ordering.requestRoute import userRoutes
-from ordering.requestRoute import shopRoutes
-from ordering.requestRoute import mealRoutes
+from ordering.routes import userRoutes
+from ordering.routes import shopRoutes
+from ordering.routes import mealRoutes

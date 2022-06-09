@@ -3,7 +3,7 @@ from ordering import db
 class User(db.Model):
     __tablename__ = 'users'
     realname = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(10), default="user", nullable=False)
+    role = db.Column(db.String(10), default='user', nullable=False)
     account = db.Column(db.String(255), primary_key=True)
     phone = db.Column(db.String(10), nullable=False)
     password = db.Column(db.String(73), nullable=False)
@@ -11,7 +11,7 @@ class User(db.Model):
     longitude = db.Column(db.Float, nullable=False)
     balance = db.Column(db.Integer, nullable=False, default=0)
     shopname = db.Column(db.String(255), db.ForeignKey('shops.shopname'), unique=True)
-    shop = db.relationship("Shop", backref=db.backref("users", uselist=False))
+    shop = db.relationship('Shop', backref=db.backref('users', uselist=False))
 
     def __init__(self, realname, account, phone, password, latitude, longitude):
         self.realname = realname
@@ -43,7 +43,7 @@ class Meal(db.Model):
     image = db.Column(db.TEXT, nullable=False)
     price = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    shop = db.relationship("Shop")
+    shop = db.relationship('Shop')
 
     def __init__(self, name, shopname, image, price, quantity):
         self.name = name

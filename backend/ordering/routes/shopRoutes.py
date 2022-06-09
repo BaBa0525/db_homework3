@@ -4,20 +4,25 @@ from http.client import BAD_REQUEST
 
 from ordering import app, db
 from ordering.models import User, Shop, Meal
-from ordering.schema import shopSchema, shopListSchema
+from ordering.schema import ShopSchema
+
+
+shopSchema = ShopSchema()
+shopListSchema = ShopSchema(many=True)
+
 
 @app.route('/getshop', methods=['POST'])
 def searchShopByFilters():
-    shopname = request.json["shopname"]
-    distance = request.json["distance"]
-    pricelow = request.json["pricelow"]
-    pricehigh = request.json["pricehigh"]
-    meal = request.json["meal"]
-    category = request.json["category"]
-    longitude = request.json["longitude"]
-    latitude = request.json["latitude"]
-    orderingBy = request.json["order"]
-    page = int(request.json["page"])
+    shopname = request.json['shopname']
+    distance = request.json['distance']
+    pricelow = request.json['pricelow']
+    pricehigh = request.json['pricehigh']
+    meal = request.json['meal']
+    category = request.json['category']
+    longitude = request.json['longitude']
+    latitude = request.json['latitude']
+    orderingBy = request.json['order']
+    page = int(request.json['page'])
 
     pattern = f'%{ meal }%'
 
@@ -113,21 +118,21 @@ def searchShopByFilters():
     shopCount = result.count()
     shopData = result.offset(5 * (page-1)).limit(5).all()
 
-    return { "shops": shopListSchema.dump(shopData), 'count': shopCount }
+    return { 'shops': shopListSchema.dump(shopData), 'count': shopCount }
 
 
 @app.route('/addshop', methods=['POST'])
 def shopRegister():
-    account = request.json["account"]
-    shopname = request.json["shopname"]
-    category = request.json["category"]
-    latitude = request.json["latitude"]
-    longitude = request.json["longitude"]
+    account = request.json['account']
+    shopname = request.json['shopname']
+    category = request.json['category']
+    latitude = request.json['latitude']
+    longitude = request.json['longitude']
     
     if Shop.query.get(shopname) is None:
         shopData = Shop(shopname, category, latitude, longitude)
         db.session.add(shopData)
-        User.query.filter(User.account == account).update({'role': "owner", 'shopname': shopname})
+        User.query.filter(User.account == account).update({'role': 'owner', 'shopname': shopname})
         db.session.commit()
         return shopSchema.jsonify(shopData)
     else:

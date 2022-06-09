@@ -3,10 +3,13 @@ from http.client import BAD_REQUEST
 
 from ordering import app, db
 from ordering.models import User
-from ordering.schema import userSchema, userListSchema
-from ordering.requestRoute import generateSalt, getHashed
+from ordering.schema import UserSchema
+from ordering.routes import generateSalt, getHashed
+
 
 ERROR_USER_NOT_EXISTS =  ({ 'message': 'The given data was invalid.', 'error': 'The user does not exists.' }, BAD_REQUEST)
+userSchema = UserSchema()
+
 
 @app.route('/login', methods = ['POST'])
 def userLogin():
@@ -59,9 +62,9 @@ def getUserByAccount(account):
 
 @app.route('/location', methods=['PUT'])
 def updateLocationOfUser():
-    account   = request.json["account"]
-    latitude  = request.json["latitude"]
-    longitude = request.json["longitude"]
+    account   = request.json['account']
+    latitude  = request.json['latitude']
+    longitude = request.json['longitude']
 
     if (userData := User.query.filter_by(account=account)) is None:
         return ERROR_USER_NOT_EXISTS

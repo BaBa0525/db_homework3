@@ -5,7 +5,7 @@ ALL_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
 
 def generateSalt(*, saltLength: int = None):
     if saltLength is None:
-        raise "Please always specify the salt length"
+        raise 'Please always specify the salt length'
 
     characters = choices(ALL_CHARACTERS, k=saltLength)
     return ''.join(characters)
