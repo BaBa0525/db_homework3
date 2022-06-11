@@ -9,11 +9,11 @@ import { useUserStore } from './stores/user.js';
 const router = useRouter();
 const userStore = useUserStore();
 
-router.push({ name: userStore.isLogin ? "home" : "signin" });
+router.push({ name: userStore.isLogin ? 'home' : 'signin' });
 </script>
 
-<style lang="scss">
-@import "@/styles/global.scss";
+<style lang='scss'>
+@import '@/styles/global.scss';
 
 #app {
   -webkit-font-smoothing: antialiased;

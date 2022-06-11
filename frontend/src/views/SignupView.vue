@@ -18,13 +18,13 @@
 </template>
 
 <script setup>
-import { reactive, computed } from "vue";
-import useVuelidate from "@vuelidate/core";
-import { required, sameAs, numeric, between, helpers, alphaNum, alpha, and, not } from "@vuelidate/validators";
-import BaseForm from "@/components/BaseForm.vue";
-import BaseInput from "@/components/BaseInput.vue";
-import axios from "axios";
-import router from "../router";
+import { reactive, computed } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { required, sameAs, numeric, between, helpers, alphaNum, alpha, and, not } from '@vuelidate/validators';
+import BaseForm from '@/components/BaseForm.vue';
+import BaseInput from '@/components/BaseInput.vue';
+import axios from 'axios';
+import router from '../router';
 
 const state = reactive({
     realname: '',
@@ -52,11 +52,11 @@ const rules = computed(() => ({
     account: {
         required,
         alphaNum,
-        uniqueAccount: helpers.withMessage("This account has been registered", not(accountExists)),
+        uniqueAccount: helpers.withMessage('This account has been registered', not(accountExists)),
     },
     phone: {
         required,
-        phoneFormat: helpers.withMessage("Invalid phone number", helpers.regex(/^09\d{8}$/)),
+        phoneFormat: helpers.withMessage('Invalid phone number', helpers.regex(/^09\d{8}$/)),
     },
     password: {
         required,
@@ -65,15 +65,15 @@ const rules = computed(() => ({
     confirm: {
         required,
         alphaNum,
-        sameAsPassword: helpers.withMessage("Please check your password again", sameAs(state.password)),
+        sameAsPassword: helpers.withMessage('Please check your password again', sameAs(state.password)),
     },
     latitude: {
         required,
-        possibleValue: helpers.withMessage("Invalid latitude", and(numeric, between(-90, 90))),
+        possibleValue: helpers.withMessage('Invalid latitude', and(numeric, between(-90, 90))),
     },
     longitude: {
         required,
-        possibleValue: helpers.withMessage("Invalid longitude", and(numeric, between(-180, 180))),
+        possibleValue: helpers.withMessage('Invalid longitude', and(numeric, between(-180, 180))),
     },
 }));
 
@@ -83,7 +83,7 @@ const handleSubmit = () => {
     v$.value.$touch();
 
     if (v$.value.$error) {
-        state.password = state.confirm = "";
+        state.password = state.confirm = '';
         return;
     }
 
@@ -91,14 +91,14 @@ const handleSubmit = () => {
         axios.post('/register', {
             data: { ...state }
         });
-        alert("Registration succeed!");
-        router.push({ name: "login" });
+        alert('Registration succeed!');
+        router.push({ name: 'login' });
     } catch {
-        alert("Registration failed!");
-        state.password = state.confirm = "";
+        alert('Registration failed!');
+        state.password = state.confirm = '';
     }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 </style>

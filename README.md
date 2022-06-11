@@ -28,7 +28,8 @@ Pages:
     - [ ] Transaction Page
 
 Components:
-- [x] Basic Input 
+- [x] Base Input 
+- [x] Base Form
 - [x] Popup Window
 - [ ] Sidebar Region
 - [ ] Item List
