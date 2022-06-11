@@ -8,13 +8,13 @@
 </template>
 
 <script setup>
-import { reactive, computed } from "vue";
-import useVuelidate from "@vuelidate/core";
-import { required, alphaNum, helpers } from "@vuelidate/validators";
-import { useRouter } from "vue-router";
-import axios from "axios";
-import BaseInput from "@/components/BaseInput.vue";
-import BaseForm from "@/components/BaseForm.vue";
+import { reactive, computed } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { required, alphaNum, helpers } from '@vuelidate/validators';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
+import BaseInput from '@/components/BaseInput.vue';
+import BaseForm from '@/components/BaseForm.vue';
 
 const router = useRouter();
 
@@ -37,7 +37,7 @@ const rules = computed(() => ({
     account: {
         required,
         alphaNum,
-        accountExists: helpers.withMessage("Account does not exist", helpers.withAsync(accountExists)),
+        accountExists: helpers.withMessage('Account does not exist', helpers.withAsync(accountExists)),
     },
     password: {
         required,
@@ -51,7 +51,7 @@ const handleSubmit = () => {
     v$.value.$touch();
 
     if (v$.value.$error) {
-        state.password = state.confirm = "";
+        state.password = state.confirm = '';
         return;
     }
 
@@ -59,11 +59,11 @@ const handleSubmit = () => {
         axios.post('/login', {
             data: { ...state }
         });
-        alert("Login successfully!");
-        router.push({ name: "home" });
+        alert('Login successfully!');
+        router.push({ name: 'home' });
     } catch {
-        alert("Login failed!");
-        state.password = state.confirm = "";
+        alert('Login failed!');
+        state.password = state.confirm = '';
     }
 }
 </script>
