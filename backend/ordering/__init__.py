@@ -6,10 +6,11 @@ from sqlalchemy import event
 from haversine import haversine, Unit
 import logging
 
-from ordering.config import DB_URI, SECRET_KEY
+from ordering.config import LOGGING, DB_URI, SECRET_KEY
 
-logging.basicConfig()
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+if LOGGING:
+    logging.basicConfig()
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 app = Flask(__name__)
 CORS(app)
