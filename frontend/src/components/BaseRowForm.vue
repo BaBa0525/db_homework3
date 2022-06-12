@@ -30,6 +30,7 @@ form {
     box-shadow: 0px 14px 20px 12px #00000012;
     border-radius: 8px;
     color: var(--text-color);
+    align-items: flex-start;
 
     button {
         border: none;
