@@ -1,5 +1,5 @@
 <template>
-  <BaseForm @submit.prevent="handleSubmit" button-text="Sign In" :disableButton="v$.$error || v$.$errors.length">
+  <BaseForm @submit.prevent="handleSubmit" button-text="Sign In" :disableButton="v$.$error || v$.$errors.length > 0">
     <BaseInput v-model="state.account" placeholder="Account" :hasError="v$.account.$error" :errors="v$.account.$errors"
       id="account" type="text" @blur="v$.account.$touch"></BaseInput>
     <BaseInput v-model="state.password" placeholder="Password" :hasError="v$.password.$error"

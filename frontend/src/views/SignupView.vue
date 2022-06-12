@@ -24,7 +24,9 @@ import { required, sameAs, numeric, between, helpers, alphaNum, alpha, and, not 
 import BaseForm from '@/components/BaseForm.vue';
 import BaseInput from '@/components/BaseInput.vue';
 import axios from 'axios';
-import router from '../router';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const state = reactive({
     realname: '',
@@ -76,7 +78,7 @@ const rules = computed(() => ({
 
 const v$ = useVuelidate(rules, state);
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
     v$.value.$touch();
 
     if (v$.value.$error) {
@@ -87,7 +89,7 @@ const handleSubmit = () => {
     try {
         await axios.post('/register', { ...state });
         alert('Registration succeed!');
-        router.push({ name: 'login' });
+        router.push({ name: 'signin' });
     } catch (error) {
         alert('Registration failed!');
         console.log(error);
