@@ -6,7 +6,7 @@
 ## Initialization
 
 ```sh
-zsh init
+zsh init.zsh
 ```
 
 ## Frontend
