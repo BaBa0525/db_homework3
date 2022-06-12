@@ -16,9 +16,9 @@ We use <code>npm</code> + Vite this time.
 <strong>TODOs</strong>
 
 Pages:
-- [ ] Index
-    - [ ] Login Page
-    - [ ] Registration Page
+- [x] Index
+    - [x] Login Page
+    - [x] Registration Page
 - [ ] Home 
     - [ ] Navigation Sidebar
     - [ ] Search Page
@@ -34,11 +34,13 @@ Pages:
     - [ ] Transaction Page
 
 Components:
-- [x] Base Input 
-- [x] Base Form
+- [x] Base Input
+- [x] Base Drop Down
+- [x] Base Form (Row / Column)
+- [x] Base Table
 - [x] Popup Window
 - [ ] Sidebar Region
-- [ ] Item List
+
 
 ## Backend
 

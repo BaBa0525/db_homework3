@@ -15,8 +15,10 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 import BaseInput from '@/components/BaseInput.vue';
 import BaseForm from '@/components/BaseForm.vue';
+import { useUserStore } from '../stores/user';
 
 const router = useRouter();
+const store = useUserStore();
 
 const state = reactive({
   account: '',
@@ -51,8 +53,9 @@ const handleSubmit = async () => {
   }
 
   try {
-    await axios.post('/login', { ...state });
+    const response = await axios.post('/login', { ...state });
     alert('Login successfully!');
+    store.$state = response.data;
     router.push({ name: 'home' });
   } catch {
     alert('Login failed!');

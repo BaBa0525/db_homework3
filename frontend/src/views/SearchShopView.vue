@@ -14,21 +14,26 @@
       type="text" @blur="v$.meal.$touch" />
   </BaseRowForm>
 
-  <b-table :field="field" :items="shops" sort-icon-right></b-table>
+  <div class="table-container">
+    <BaseTable :fields="field" :items="shops">
+      <template v-slot:cell(action)="{ item }">
+        <button type="button" @click="handleClick(item)">Open Menu</button>
+      </template>
+    </BaseTable>
+  </div>
+
 </template>
 
 <script setup>
 import { reactive, computed } from "vue";
 import useVuelidate from "@vuelidate/core";
-import { numeric, alphaNum, minValue } from "@vuelidate/validators";
-import { useRouter } from "vue-router";
+import { decimal, alphaNum, minValue, helpers } from "@vuelidate/validators";
+import { useUserStore } from "@/stores/user";
 import axios from "axios";
 import BaseInput from "@/components/BaseInput.vue";
-import BaseRowForm from "@/components/BaseRowForm.vue";
 import BaseDropDown from "@/components/BaseDropDown.vue";
-import { useUserStore } from "@/stores/user";
-
-const router = useRouter();
+import BaseRowForm from "@/components/BaseRowForm.vue";
+import BaseTable from "@/components/BaseTable.vue";
 
 const options = ['near', 'middle', 'far'];
 
@@ -62,12 +67,12 @@ const rules = computed(() => ({
   },
   distance: {},
   pricelow: {
-    numeric,
-    minValue: minValue(0),
+    decimal,
+    minValue: helpers.withMessage('Invalid minimum price', minValue(0)),
   },
   pricehigh: {
-    numeric,
-    minValue: minValue(Math.max(0, state.pricelow))
+    decimal,
+    minValue: helpers.withMessage('Invalid maximum price', minValue(Math.max(0, state.pricelow))),
   },
   category: {},
   meal: {},
@@ -95,7 +100,25 @@ const handleSubmit = async () => {
     console.log(error);
   }
 }
+
+const handleClick = (item) => {
+  alert("Hello " + item.shop_name);
+}
 </script>
 
 <style scoped lang="scss">
+button {
+  border: none;
+  border-radius: 4px;
+  padding: 10px 12px;
+  background-color: var(--info-color);
+  color: var(--white-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
 </style>
