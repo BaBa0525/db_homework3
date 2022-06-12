@@ -3,6 +3,12 @@
 > Topic: Food Ordering Service part.2 <br>
 > Deadline: 2022/06/17 23:59
 
+## Initialization
+
+```sh
+zsh init
+```
+
 ## Frontend
 
 We use <code>npm</code> + Vite this time.
@@ -35,19 +41,6 @@ Components:
 - [ ] Item List
 
 ## Backend
-
-1. Create virtual environment
-    ```sh
-    virtualenv -p python3 venv
-    ```
-2. Activate the virtual environment
-    ```sh
-    source activate
-    ```
-3. Install packages
-    ```sh   
-    pip install flask flask-sqlalchemy flask-marshmallow flask-cors marshmallow marshmallow-sqlalchemy haversine
-    ```
 
 ### Package Structure
 

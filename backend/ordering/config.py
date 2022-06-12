@@ -1,6 +1,7 @@
 from os import path, getcwd
 
-DEBUG=True 
+DEBUG = True
+LOGGING = True 
 
 BASE_DIR = path.abspath(getcwd())
 DB_NAME = 'db_homework.db'

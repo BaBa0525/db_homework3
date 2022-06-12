@@ -1,5 +1,5 @@
 <template>
-    <BaseForm @submit.prevent="handleSubmit" button-text="Sign Up" :disableButton="v$.$error || v$.$errors.length">
+    <BaseForm @submit.prevent="handleSubmit" button-text="Sign Up" :disableButton="v$.$error || v$.$errors.length > 0">
         <BaseInput v-model="state.realname" placeholder="Real Name" :hasError="v$.realname.$error"
             :errors="v$.realname.$errors" id="realname" type="text" @blur="v$.realname.$touch"></BaseInput>
         <BaseInput v-model="state.account" placeholder="Account" :hasError="v$.account.$error"
@@ -36,14 +36,11 @@ const state = reactive({
     longitude: '',
 });
 
-const accountExists = async () => {
-    try {
-        axios.get(`/getuser/${state.account}`);
-        return true;
-    } catch (error) {
-        return false;
-    }
+const isAccountUnique = async () => {
+    const response = await axios.get(`check/${state.account}`);
+    return !response.data.exists;
 }
+
 const rules = computed(() => ({
     realname: {
         required,
@@ -52,7 +49,7 @@ const rules = computed(() => ({
     account: {
         required,
         alphaNum,
-        uniqueAccount: helpers.withMessage('This account has been registered', not(accountExists)),
+        uniqueAccount: helpers.withMessage('This account has been registered', helpers.withAsync(isAccountUnique)),
     },
     phone: {
         required,
@@ -88,13 +85,14 @@ const handleSubmit = () => {
     }
 
     try {
-        axios.post('/register', {
-            data: { ...state }
-        });
+        console.log(state);
+        console.log({ ...state });
+        axios.post('/register', { ...state });
         alert('Registration succeed!');
         router.push({ name: 'login' });
-    } catch {
+    } catch (error) {
         alert('Registration failed!');
+        console.log(error);
         state.password = state.confirm = '';
     }
 }
