@@ -52,12 +52,12 @@ def userRegister():
 
 
 
-@app.route('/getuser/<account>', methods = ['GET'])
-def getUserByAccount(account):
-    if (userData := User.query.get(account)) is None:
-        return ERROR_USER_NOT_EXISTS
-    else: 
-        return userSchema.jsonify(userData)
+@app.route('/check/<account>', methods = ['GET'])
+def checkAccountExistence(account):
+    if User.query.get(account) is None:
+        return { 'exists': False}
+    else:
+        return { 'exists': True }
 
 
 @app.route('/location', methods=['PUT'])

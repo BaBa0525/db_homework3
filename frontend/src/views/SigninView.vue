@@ -23,21 +23,16 @@ const state = reactive({
     password: '',
 });
 
-const accountExists = async () => {
-    try {
-        axios.get(`/getuser/${state.account}`);
-        return true;
-    } catch (error) {
-        return false;
-    }
+const isAccountExists = async () => {
+    const response = await axios.get(`check/${state.account}`);
+    return response.data.exists;
 }
-
 
 const rules = computed(() => ({
     account: {
         required,
         alphaNum,
-        accountExists: helpers.withMessage('Account does not exist', helpers.withAsync(accountExists)),
+        accountExists: helpers.withMessage('Account does not exist', helpers.withAsync(isAccountExists)),
     },
     password: {
         required,
