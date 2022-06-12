@@ -85,9 +85,7 @@ const handleSubmit = () => {
     }
 
     try {
-        console.log(state);
-        console.log({ ...state });
-        axios.post('/register', { ...state });
+        await axios.post('/register', { ...state });
         alert('Registration succeed!');
         router.push({ name: 'login' });
     } catch (error) {
