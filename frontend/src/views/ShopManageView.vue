@@ -33,17 +33,24 @@
     <template #cell(photo)="{ item }">
       <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
     </template>
+    <template #cell(price)="{ item }">
+      <BaseInput :disabled="!item.isEditing" v-model="item.price" placeholder="Quantity" type="text"
+        style="text-align: center; cursor: default;" />
+    </template>
+    <template #cell(quantity)="{ item }">
+      <BaseInput :disabled="!item.isEditing" v-model="item.quantity" placeholder="Quantity" type="text"
+        style="text-align: center; cursor: default;" />
+    </template>
     <template #cell(edit)="{ item }">
-      <button type="button">Edit</button>
+      <button type="button" @click="handleEdit(item)">
+        <span v-if="item.isEditing">Finish</span>
+        <span v-else>Edit</span>
+      </button>
     </template>
     <template #cell(delete)="{ item }">
-      <button type="button">Delete</button>
+      <button type="button" @click="handleDelete(item)">Delete</button>
     </template>
   </BaseTable>
-
-  <ul class="pages">
-    <li v-for="page in totalPages" :key="page">{{ page }}</li>
-  </ul>
 </template>
 
 <script setup>
@@ -190,6 +197,8 @@ const handleImageChange = (event) => {
 }
 
 const handleAddMeal = async () => {
+  mealv$.value.$touch();
+  if (mealv$.value.$error) return;
   try {
     await axios.post('/addmeal', {
       ...mealState,
@@ -211,7 +220,36 @@ const fields = [
   { key: 'delete', sortable: false },
 ];
 
+const handleEdit = async (item) => {
+  item.isEditing = !item.isEditing;
+  if (item.isEditing) {
+
+  } else {
+
+  }
+}
+
+const handleDelete = async (item) => {
+
+}
 </script>
 
 <style scoped lang="scss">
+@import "@/styles/global.scss";
+
+button {
+  border: none;
+  border-radius: 4px;
+  padding: 10px 12px;
+  background-color: var(--info-color);
+  color: var(--white-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100px;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
 </style>
