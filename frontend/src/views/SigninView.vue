@@ -26,8 +26,13 @@ const state = reactive({
 });
 
 const isAccountExists = async () => {
-  const response = await axios.get(`check/${state.account}`);
-  return response.data.exists;
+  try {
+    const response = await axios.get(`check/${state.account}`);
+    return response.data.exists;
+  } catch (error) {
+    console.log(error);
+    return true;
+  }
 }
 
 const rules = computed(() => ({
