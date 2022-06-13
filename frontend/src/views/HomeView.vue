@@ -1,10 +1,10 @@
 <template>
-    <SearchShopView></SearchShopView>
+    <router-link to="search"> Search </router-link>
+    <router-link to="shop"> Shop </router-link>
+    <router-view></router-view>
 </template>
 
 <script setup>
-import SearchShopView from "./SearchShopView.vue";
-
 </script>
 
 <style scoped>
