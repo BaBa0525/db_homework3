@@ -2,16 +2,17 @@
   <table>
     <thead>
       <tr>
-        <th v-for="(field, index) in fields" :id="index" :class="getHeaderClass(field)" @click="handleSorting(field)">
+        <th v-for="(field, index) in fields" :id="index" :class="{ 'clickable': field.sortable }"
+          @click="handleClick(field)">
           {{ getTitle(field.key) }}
-          <IconSort v-if="field.sortable" :status="status[field.key]"></IconSort>
+          <IconSortable v-if="field.sortable" :status="status[field.key]"></IconSortable>
         </th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="(item, index) in items" :id="index">
         <td v-for="field in fields">
-          <slot :name="getSlotName(field.key)" :item="item">
+          <slot :name="`cell(${field.key})`" :item="item">
             {{ item[field.key] }}
           </slot>
         </td>
@@ -22,7 +23,7 @@
 
 <script setup>
 import { reactive } from 'vue';
-import IconSort from './icons/IconSort.vue';
+import IconSortable from './icons/IconSortable.vue';
 
 const props = defineProps({
   fields: {
@@ -41,9 +42,6 @@ const getTitle = (str) => {
   return result.join(' ');
 }
 
-const getHeaderClass = (field) => (field.sortable ? "clickable" : "");
-const getSlotName = (key) => (`cell(${key})`);
-
 const status = reactive({});
 
 const resetStatus = () => {
@@ -56,8 +54,11 @@ const resetStatus = () => {
 
 resetStatus();
 
-const handleSorting = (field) => {
+const emit = defineEmits(['sort-by']);
+
+const handleClick = (field) => {
   if (!field.sortable) return;
+
   const key = field.key;
   const originalStatus = status[key];
 
@@ -68,6 +69,7 @@ const handleSorting = (field) => {
   } else {
     status[key] = 'asc';
   }
+  emit('sort-by', key, status[key]);
 }
 </script>
 

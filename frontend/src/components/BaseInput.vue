@@ -1,6 +1,6 @@
 <template>
   <div class="input">
-    <input v-bind="$attrs" :value="modelValue" :class="inputClass"
+    <input v-bind="$attrs" :value="modelValue" :class="{ 'filled': modelValue, 'danger': hasError }"
       @input="$emit('update:modelValue', $event.target.value)" />
     <label class="placeholder">
       <span>{{ placeholder }}</span>
@@ -14,8 +14,6 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-
 const props = defineProps({
   modelValue: {
     type: String,
@@ -33,12 +31,6 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-});
-
-const inputClass = computed(() => {
-  const filled = props.modelValue ? "filled" : "";
-  const danger = props.hasError ? "danger" : "";
-  return ["field", filled, danger].join(" ");
 });
 </script>
 
