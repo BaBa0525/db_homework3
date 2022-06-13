@@ -1,5 +1,5 @@
 <template>
-  <aside :class="asideClass(expand)">
+  <aside :class="{ 'expand': isExpanded }">
     <IconLogo class="logo"></IconLogo>
     <div class="menu-toggle-wrap">
       <button class="menu-toggle" @click="toggleMenu">
@@ -11,7 +11,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
 import IconLogo from './icons/IconLogo.vue';
 import IconToggle from './icons/IconToggle.vue';
 
@@ -20,11 +19,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   }
-});
-
-const asideClass = computed((isExpanded) => {
-  if (isExpanded) return "expand";
-  else return "shrink";
 });
 </script>
 

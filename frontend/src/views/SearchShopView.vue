@@ -15,25 +15,39 @@
   </BaseRowForm>
 
   <div class="table-container">
-    <BaseTable :fields="field" :items="shops">
-      <template v-slot:cell(action)="{ item }">
-        <button type="button" @click="handleClick(item)">Open Menu</button>
+    <BaseTable :fields="shopsField" :items="shops" @sort-by="handleSorting">
+      <template #cell(action)="{ item }">
+        <button type="button" @click="handleTogglePopup(item)">Open Menu</button>
       </template>
     </BaseTable>
   </div>
 
+  <ul>
+    <li v-for="pageNumber in totalPages">{{ pageNumber }}</li>
+  </ul>
+
+  <PopupModal :show="popupShop.active" @close-popup="popupShop.active = false">
+    <h1>Menu of {{ popupShop.shopname }}</h1>
+    <BaseTable :fields="mealsField" :items="meals">
+      <template #cell(order)="{ item }">
+        <button type="button" @click="addToOrder(item)">Order</button>
+      </template>
+    </BaseTable>
+  </PopupModal>
 </template>
 
 <script setup>
-import { reactive, computed } from "vue";
+import { ref, reactive, computed } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { decimal, alphaNum, minValue, helpers } from "@vuelidate/validators";
 import { useUserStore } from "@/stores/user";
 import axios from "axios";
-import BaseInput from "@/components/BaseInput.vue";
-import BaseDropDown from "@/components/BaseDropDown.vue";
-import BaseRowForm from "@/components/BaseRowForm.vue";
-import BaseTable from "@/components/BaseTable.vue";
+import haversine from "haversine";
+import BaseInput from "../components/BaseInput.vue";
+import BaseDropDown from "../components/BaseDropDown.vue";
+import BaseRowForm from "../components/BaseRowForm.vue";
+import BaseTable from "../components/BaseTable.vue";
+import PopupModal from "../components/PopupModal.vue";
 
 const options = ['near', 'middle', 'far'];
 
@@ -46,20 +60,6 @@ const state = reactive({
   meal: '',
   page: 1,
 });
-
-const field = [
-  { key: 'index', sortable: false },
-  { key: 'shop_name', sortable: true },
-  { key: 'distance', sortable: true },
-  { key: 'category', sortable: true },
-  { key: 'action', sortable: false },
-]
-
-const shops = reactive([
-  { index: 1, shop_name: 'shop1', distance: 345, category: 'category1', action: 'action1' },
-  { index: 2, shop_name: 'shop2', distance: 3520, category: 'category2', action: 'action2' },
-  { index: 3, shop_name: 'shop3', distance: 1234, category: 'category3', action: 'action3' },
-]);
 
 const rules = computed(() => ({
   shopname: {
@@ -80,7 +80,42 @@ const rules = computed(() => ({
 
 const v$ = useVuelidate(rules, state);
 
-const store = useUserStore();
+const userStore = useUserStore();
+const totalPages = ref(0);
+
+const parseResponse = (response) => {
+  const shopsResponse = response.data.shops;
+  const countResponse = response.data.count;
+
+  totalPages.value = Math.ceil(countResponse / 5);
+  let indexCounter = 1;
+
+  for (const shop in shopsResponse) {
+    shops.push({
+      index: indexCounter++,
+      shop_name: shop.shopname,
+      distance: haversine(
+        [userStore.latitude, userStore.longitude],
+        [shop.latitude, shop.longitude],
+        { unit: 'meter', format: '[lat, lon]' }),
+      category: shop.category,
+    });
+  }
+}
+
+const shopsField = [
+  { key: 'index', sortable: false },
+  { key: 'shopname', sortable: true },
+  { key: 'distance', sortable: true },
+  { key: 'category', sortable: true },
+  { key: 'action', sortable: false },
+];
+
+const shops = reactive([
+  { index: 1, shopname: 'shop1', distance: 345, category: 'category1', action: 'action1' },
+  { index: 2, shopname: 'shop2', distance: 3520, category: 'category2', action: 'action2' },
+  { index: 3, shopname: 'shop3', distance: 1234, category: 'category3', action: 'action3' },
+]);
 
 const handleSubmit = async () => {
   v$.value.$touch();
@@ -92,18 +127,76 @@ const handleSubmit = async () => {
   try {
     const response = await axios.post('/getshop', {
       ...state,
-      longitude: store.longitude,
-      latitude: store.latitude,
+      latitude: userStore.latitude,
+      longitude: userStore.longitude,
       order: '',
     });
+
+    parseResponse(response);
+
   } catch (error) {
     console.log(error);
   }
 }
 
-const handleClick = (item) => {
-  alert("Hello " + item.shop_name);
+const handleSorting = async (key, order) => {
+  try {
+    const response = await axios.post('/getshop', {
+      ...state,
+      latitude: userStore.latitude,
+      longitude: userStore.longitude,
+      order: `${key}$${order}`,
+    });
+
+    parseResponse(response);
+
+  } catch (error) {
+    console.log(error);
+  }
 }
+
+const popupShop = reactive({
+  active: false,
+});
+
+const meals = reactive([]);
+
+const getMeals = async () => {
+  meals.splice(0, meals.length);
+  try {
+    const response = await axios.get(`/getmeal/${popupShop.shopname}`);
+    let indexCounter = 1;
+
+    for (const meal in response.data) {
+      meals.push({
+        ...meal,
+        index: indexCounter++,
+      });
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handleTogglePopup = (item) => {
+  popupShop.active = true;
+  popupShop.shopname = item.shopname;
+  getMeals();
+}
+
+const mealsField = [
+  { key: 'index', sortable: false },
+  { key: 'picture', sortable: false },
+  { key: 'name', sortable: false },
+  { key: 'price', sortable: false },
+  { key: 'quantity', sortable: false },
+  { key: 'order', sortable: false },
+];
+
+const addToOrder = async () => {
+  alert('TODO: add to order');
+};
 </script>
 
 <style scoped lang="scss">

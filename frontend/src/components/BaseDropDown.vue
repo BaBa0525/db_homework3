@@ -1,7 +1,7 @@
 <template>
   <div class="drop-down-menu">
     <select v-bind="$attrs" :value="modelValue" @change="$emit('update:modelValue', $event.target.value)"
-      :class="inputClass">
+      :class="{ 'filled': modelValue }">
       <option v-for="(option, index) in options" :id="index">{{ option }}</option>
     </select>
     <label class="placeholder">
@@ -11,7 +11,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
 const props = defineProps({
   modelValue: {
     type: String,
@@ -25,13 +24,7 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-}
-)
-
-const inputClass = computed(() => {
-  const filled = props.modelValue ? "filled" : "";
-  return ["field", filled].join(" ");
-})
+});
 </script>
 
 <style scoped lang="scss">
