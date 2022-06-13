@@ -20,12 +20,12 @@ Pages:
     - [x] Login Page
     - [x] Registration Page
 - [ ] Home 
-    - [ ] Navigation Sidebar
-    - [ ] Search Page
-        - [ ] Menu
+    - [ ] Navigation Sidebar {BaBa}
         - [ ] Recharge
+    - [ ] Search Page {Alan}
+        - [ ] Menu
     - [ ] Shop Management Page
-        - [ ] Shop Registration
+        - [x] Shop Registration
         - [ ] Shop Meals Editing
     - [ ] User Order Page
         - [ ] Order Detail
@@ -39,8 +39,6 @@ Components:
 - [x] Base Form (Row / Column)
 - [x] Base Table
 - [x] Popup Window
-- [ ] Sidebar Region
-
 
 ## Backend
 
