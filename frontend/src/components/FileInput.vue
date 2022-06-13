@@ -1,7 +1,6 @@
 <template>
   <div class="input">
-    <input v-bind="$attrs" :value="modelValue" :class="{ 'filled': modelValue, 'danger': hasError }"
-      @input="$emit('update:modelValue', $event.target.value)" />
+    <input v-bind="$attrs" type="file" :class="{ 'filled': !isEmpty, 'danger': hasError }" @change="fileChange" />
     <label class="placeholder">
       <span>{{ placeholder }}</span>
     </label>
@@ -14,11 +13,14 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
+
+const isEmpty = ref(true);
+const fileChange = (event) => {
+  isEmpty.value = event.target.files.length === 0;
+}
+
 const props = defineProps({
-  modelValue: {
-    type: [String, Number],
-    default: "",
-  },
   placeholder: {
     type: String,
     default: "",
@@ -65,6 +67,14 @@ const props = defineProps({
 
     &.danger {
       border: 2px solid var(--danger-color);
+    }
+
+    &[type="file"] {
+      cursor: pointer;
+
+      &::-webkit-file-upload-button {
+        display: none;
+      }
     }
 
     &:disabled {

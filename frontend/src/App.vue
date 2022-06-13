@@ -9,7 +9,7 @@ import { useUserStore } from './stores/user.js';
 const router = useRouter();
 const userStore = useUserStore();
 
-router.push({ name: userStore.isLogin ? 'home' : 'signin' });
+router.push({ name: userStore.isLogin ? 'search' : 'signin' });
 </script>
 
 <style lang='scss'>

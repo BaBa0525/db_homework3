@@ -35,22 +35,25 @@ const emits = defineEmits(['close-popup'])
   z-index: 98;
 
   background-color: rgba(0, 0, 0, 0.3);
-
 }
 
 .modal {
   position: fixed;
   top: 15%;
   left: 15%;
+  right: 15%;
+  bottom: 15%;
   z-index: 99;
-
-  width: 70%;
-  height: 70%;
+  padding: 50px;
 
   background-color: var(--white-color);
   border-radius: 16px;
 
-  padding: 25px;
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   .icon {
     position: absolute;

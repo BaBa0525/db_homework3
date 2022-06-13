@@ -52,10 +52,15 @@ def userRegister():
 
 
 
+@app.route('/check/', methods = ['GET'])
+def checkAccountExistence_NoArg():
+    return { 'exists': False }
+    
+
 @app.route('/check/<account>', methods = ['GET'])
 def checkAccountExistence(account):
     if User.query.get(account) is None:
-        return { 'exists': False}
+        return { 'exists': False }
     else:
         return { 'exists': True }
 

@@ -22,13 +22,17 @@
     </BaseTable>
   </div>
 
-  <ul>
-    <li v-for="pageNumber in totalPages">{{ pageNumber }}</li>
+  <ul class="page-list">
+    <li v-for="pageNumber in totalPages" :class="{ 'current-page': (state.page === pageNumber) }"
+      @click="handleChangePage(pageNumber)">{{ pageNumber }}</li>
   </ul>
 
   <PopupModal :show="popupShop.active" @close-popup="popupShop.active = false">
     <h1>Menu of {{ popupShop.shopname }}</h1>
     <BaseTable :fields="mealsField" :items="meals">
+      <template #cell(picture)="{ item }">
+        <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
+      </template>
       <template #cell(order)="{ item }">
         <button type="button" @click="addToOrder(item)">Order</button>
       </template>
@@ -44,6 +48,7 @@ import { useUserStore } from "@/stores/user";
 import axios from "axios";
 import haversine from "haversine";
 import BaseInput from "../components/BaseInput.vue";
+import BaseImage from "../components/BaseImage.vue";
 import BaseDropDown from "../components/BaseDropDown.vue";
 import BaseRowForm from "../components/BaseRowForm.vue";
 import BaseTable from "../components/BaseTable.vue";
@@ -83,26 +88,6 @@ const v$ = useVuelidate(rules, state);
 const userStore = useUserStore();
 const totalPages = ref(0);
 
-const parseResponse = (response) => {
-  const shopsResponse = response.data.shops;
-  const countResponse = response.data.count;
-
-  totalPages.value = Math.ceil(countResponse / 5);
-  let indexCounter = 1;
-
-  for (const shop in shopsResponse) {
-    shops.push({
-      index: indexCounter++,
-      shop_name: shop.shopname,
-      distance: haversine(
-        [userStore.latitude, userStore.longitude],
-        [shop.latitude, shop.longitude],
-        { unit: 'meter', format: '[lat, lon]' }),
-      category: shop.category,
-    });
-  }
-}
-
 const shopsField = [
   { key: 'index', sortable: false },
   { key: 'shopname', sortable: true },
@@ -111,48 +96,58 @@ const shopsField = [
   { key: 'action', sortable: false },
 ];
 
-const shops = reactive([
-  { index: 1, shopname: 'shop1', distance: 345, category: 'category1', action: 'action1' },
-  { index: 2, shopname: 'shop2', distance: 3520, category: 'category2', action: 'action2' },
-  { index: 3, shopname: 'shop3', distance: 1234, category: 'category3', action: 'action3' },
-]);
+const shops = reactive([]);
 
-const handleSubmit = async () => {
-  v$.value.$touch();
-
-  if (v$.value.$error) {
-    return;
-  }
-
+const updateShopList = async (orderString = '') => {
   try {
     const response = await axios.post('/getshop', {
       ...state,
       latitude: userStore.latitude,
       longitude: userStore.longitude,
-      order: '',
+      order: orderString,
     });
 
-    parseResponse(response);
+    const shopsResponse = response.data.shops;
+    const countResponse = response.data.count;
 
+    totalPages.value = Math.ceil(countResponse / 5);
+    let indexCounter = 1;
+
+    shops.splice(0, shops.length);
+
+    for (const i in shopsResponse) {
+      const shop = shopsResponse[i];
+      shops.push({
+        index: indexCounter++,
+        shopname: shop.shopname,
+        distance: haversine(
+          { latitude: userStore.latitude, longitude: userStore.longitude },
+          { latitude: shop.latitude, longitude: shop.longitude },
+          { unit: 'meter' }),
+        category: shop.category,
+      });
+    }
   } catch (error) {
     console.log(error);
   }
 }
 
+const handleSubmit = async () => {
+  v$.value.$touch();
+  if (v$.value.$error) return;
+  await updateShopList();
+}
+
 const handleSorting = async (key, order) => {
-  try {
-    const response = await axios.post('/getshop', {
-      ...state,
-      latitude: userStore.latitude,
-      longitude: userStore.longitude,
-      order: `${key}$${order}`,
-    });
+  if (shops.length === 0) return;
+  await updateShopList(`${key}$${order}`);
+}
 
-    parseResponse(response);
-
-  } catch (error) {
-    console.log(error);
-  }
+const handleChangePage = async (pageNumber) => {
+  if (state.page === pageNumber) return;
+  alert('change to page ' + pageNumber);
+  state.page = pageNumber;
+  await updateShopList();
 }
 
 const popupShop = reactive({
@@ -165,9 +160,11 @@ const getMeals = async () => {
   meals.splice(0, meals.length);
   try {
     const response = await axios.get(`/getmeal/${popupShop.shopname}`);
+    const mealsResponse = response.data;
     let indexCounter = 1;
 
-    for (const meal in response.data) {
+    for (const i in mealsResponse) {
+      const meal = mealsResponse[i];
       meals.push({
         ...meal,
         index: indexCounter++,
@@ -200,6 +197,8 @@ const addToOrder = async () => {
 </script>
 
 <style scoped lang="scss">
+@import "@/styles/global.scss";
+
 button {
   border: none;
   border-radius: 4px;
@@ -212,6 +211,24 @@ button {
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+}
+
+.page-list {
+  @include flex-row;
+  gap: 25px;
+
+  li {
+    list-style: none;
+    font-size: 1.05rem;
+    cursor: pointer;
+    color: var(--text-color);
+    font-weight: 300;
+
+    &.current-page {
+      color: var(--info-color);
+      font-weight: 600;
+    }
   }
 }
 </style>

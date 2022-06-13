@@ -159,3 +159,16 @@ def getShopByShopname(shopname):
         return ({'message': 'The given data was invalid.', 'error': 'The shopname has not been registered.'}, BAD_REQUEST)
     else:
         return shopSchema.jsonify(shopData)
+
+
+@app.route('/checkshop/', methods = ['GET'])
+def checkShopExistence_NoArg():
+    return { 'exists': False }
+
+
+@app.route('/checkshop/<shopname>', methods = ['GET'])
+def checkShopExistence(shopname):
+    if Shop.query.get(shopname) is None:
+        return { 'exists': False }
+    else:
+        return { 'exists': True }

@@ -2,7 +2,7 @@
   <table>
     <thead>
       <tr>
-        <th v-for="(field, index) in fields" :id="index" :class="{ 'clickable': field.sortable }"
+        <th v-for="(field, index) in fields" :key="index" :class="{ 'clickable': field.sortable }"
           @click="handleClick(field)">
           {{ getTitle(field.key) }}
           <IconSortable v-if="field.sortable" :status="status[field.key]"></IconSortable>
@@ -10,7 +10,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(item, index) in items" :id="index">
+      <tr v-for="(item, index) in items" :key="index">
         <td v-for="field in fields">
           <slot :name="`cell(${field.key})`" :item="item">
             {{ item[field.key] }}
