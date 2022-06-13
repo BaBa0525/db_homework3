@@ -25,6 +25,18 @@ const router = createRouter({
       name: 'home',
       path: '/home',
       component: () => import('../views/HomeView.vue'),
+      children: [
+        {
+          name: 'search',
+          path: '/search',
+          component: () => import('../views/SearchShopView.vue'),
+        },
+        {
+          name: 'shop',
+          path: '/shop',
+          component: () => import('../views/ShopManageView.vue'),
+        }
+      ]
     }
   ]
 })
