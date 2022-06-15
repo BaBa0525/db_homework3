@@ -92,8 +92,7 @@ const startup = async () => {
     const response = await axios.get(`/getmeal/${shopState.shopname}`);
     const mealsResponse = response.data;
     let indexCounter = 1;
-    for (const i in mealsResponse) {
-      const meal = mealsResponse[i];
+    for (const meal of mealsResponse) {
       meals.push({
         index: indexCounter++,
         ...meal,
@@ -227,6 +226,7 @@ const handleEdit = async (item) => {
   } else {
 
   }
+
 }
 
 const handleDelete = async (item) => {
