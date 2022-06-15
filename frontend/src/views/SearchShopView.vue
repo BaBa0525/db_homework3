@@ -115,8 +115,7 @@ const updateShopList = async (orderString = '') => {
 
     shops.splice(0, shops.length);
 
-    for (const i in shopsResponse) {
-      const shop = shopsResponse[i];
+    for (const shop of shopsResponse) {
       shops.push({
         index: indexCounter++,
         shopname: shop.shopname,
@@ -163,8 +162,8 @@ const getMeals = async () => {
     const mealsResponse = response.data;
     let indexCounter = 1;
 
-    for (const i in mealsResponse) {
-      const meal = mealsResponse[i];
+    for (const meal of mealsResponse) {
+      console.log(meal);
       meals.push({
         ...meal,
         index: indexCounter++,
