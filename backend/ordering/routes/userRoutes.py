@@ -51,6 +51,13 @@ def userRegister():
         return ({ 'message': 'The given data was invalid.', 'error': 'The account has been registered.' }, BAD_REQUEST)
 
 
+@app.route('/getuser/<account>', methods = ['GET'])
+def getUserData(account):
+    if (userData := User.query.get(account)) is None:
+        return ERROR_USER_NOT_EXISTS
+    else:
+        return userSchema.jsonify(userData)
+
 
 @app.route('/check/', methods = ['GET'])
 def checkAccountExistence_NoArg():
