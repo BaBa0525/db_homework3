@@ -35,15 +35,17 @@
       <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
     </template>
     <template #cell(price)="{ item }">
-      <BaseInput :disabled="!item.isEditing" v-model="item.price" placeholder="Quantity" type="text"
+      <BaseInput :disabled="!item.isEditing" v-model="item.price" :hasError="item.v$.price.$error"
+        :errors="item.v$.price.$errors" type="text" @blur="item.v$.price.$touch"
         style="text-align: center; cursor: default;" />
     </template>
     <template #cell(quantity)="{ item }">
-      <BaseInput :disabled="!item.isEditing" v-model="item.quantity" placeholder="Quantity" type="text"
+      <BaseInput :disabled="!item.isEditing" v-model="item.quantity" :hasError="item.v$.quantity.$error"
+        :errors="item.v$.quantity.$errors" type="text" @blur="item.v$.quantity.$touch"
         style="text-align: center; cursor: default;" />
     </template>
     <template #cell(edit)="{ item }">
-      <button type="button" @click="handleEdit(item)">
+      <button type="button" :disabled="item.v$.$error || item.v$.$errors.length > 0" @click="handleEdit(item)">
         <span v-if="item.isEditing">Finish</span>
         <span v-else>Edit</span>
       </button>
@@ -64,12 +66,11 @@ import { useUserStore } from '../stores/user';
 
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { reactive, computed, ref } from 'vue';
+import { reactive, computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, decimal, between, helpers, minValue } from '@vuelidate/validators';
 
 const userStore = useUserStore();
-userStore.reload();
 
 const shopState = reactive({
   shopname: '',
@@ -79,30 +80,50 @@ const shopState = reactive({
 });
 const meals = reactive([]);
 
-const startup = async () => {
+const loadUserShop = async () => {
   try {
-    const response = await axios.get(`/getshop/${userStore.account}`);
-    shopState.shopname = response.data.shopname;
-    shopState.category = response.data.category;
-    shopState.latitude = response.data.latitude;
-    shopState.longitude = response.data.longitude;
-  } catch (error) {
-    console.log(error);
-  }
-
-  try {
-    const response = await axios.get(`/getmeal/${shopState.shopname}`);
-    const mealsResponse = response.data;
-    let indexCounter = 1;
-    for (const meal of mealsResponse) {
-      meals.push({
-        index: indexCounter++,
-        ...meal,
-      });
+    const response = await axios.get(`/getshop/${userStore.shopname}`);
+    for (const property in shopState) {
+      shopState[property] = response.data[property];
     }
   } catch (error) {
     console.log(error);
   }
+};
+
+const editRules = computed(() => ({
+  price: { required, decimal, minValue: minValue(0), },
+  quantity: { required, decimal, minValue: minValue(0), },
+}));
+
+const loadShopMeals = async () => {
+  try {
+    const response = await axios.get(`/getmeal/${userStore.shopname}`);
+    const mealsResponse = response.data;
+
+    let indexCounter = 1;
+    meals.splice(0, meals.length);
+
+    for (const meal of mealsResponse) {
+      meals.push({
+        index: indexCounter++,
+        isEditing: false,
+        ...meal,
+      });
+
+      meals[meals.length - 1].v$ = useVuelidate(editRules, meals[meals.length - 1]);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  console.log(meals);
+}
+
+const startup = async () => {
+  if (!userStore.isOwner) return;
+
+  await loadUserShop();
+  await loadShopMeals();
 };
 
 startup();
@@ -117,19 +138,9 @@ const shopRules = computed(() => ({
     required,
     unique: helpers.withMessage('The shop name has been registered', helpers.withAsync(isShopnameUnique)),
   },
-  category: {
-    required,
-  },
-  latitude: {
-    required,
-    decimal,
-    between: between(-90, 90),
-  },
-  longitude: {
-    required,
-    decimal,
-    between: between(-180, 180),
-  },
+  category: { required, },
+  latitude: { required, decimal, between: between(-90, 90), },
+  longitude: { required, decimal, between: between(-180, 180), },
 }));
 
 const shopv$ = useVuelidate(shopRules, shopState);
@@ -138,7 +149,7 @@ const router = useRouter();
 const handleRegister = async () => {
   shopv$.value.$touch();
 
-  if (shopv$.value.$error) return;
+  if (shopv$.value.$error || shopv$.value.$errors.length > 0) return;
 
   try {
     await axios.post('/addshop', {
@@ -147,7 +158,7 @@ const handleRegister = async () => {
     });
     alert('Registration succeed!');
     userStore.reload();
-    router.go(0);
+    await loadUserShop();
   } catch (error) {
     console.log(error);
   }
@@ -162,22 +173,10 @@ const mealState = reactive({
 });
 
 const mealRules = computed(() => ({
-  mealname: {
-    required,
-  },
-  price: {
-    required,
-    decimal,
-    minValue: minValue(0),
-  },
-  quantity: {
-    required,
-    decimal,
-    minValue: minValue(0),
-  },
-  image: {
-    required,
-  },
+  mealname: { required, },
+  price: { required, decimal, minValue: minValue(0), },
+  quantity: { required, decimal, minValue: minValue(0), },
+  image: { required, },
 }));
 
 const mealv$ = useVuelidate(mealRules, mealState);
@@ -198,13 +197,13 @@ const handleImageChange = (event) => {
 
 const handleAddMeal = async () => {
   mealv$.value.$touch();
-  if (mealv$.value.$error) return;
+  if (mealv$.value.$error || mealv$.value.$errors.length > 0) return;
   try {
     await axios.post('/addmeal', {
       ...mealState,
       shopname: shopState.shopname,
     });
-    router.go(0);
+    await loadShopMeals();
   } catch (error) {
     console.log(error);
   }
@@ -221,17 +220,32 @@ const fields = [
 ];
 
 const handleEdit = async (item) => {
-  item.isEditing = !item.isEditing;
-  if (item.isEditing) {
+  try {
+    if (item.isEditing) {
+      item.v$.$touch();
+      if (item.v$.$error || item.v$.$errors.length > 0) return;
 
-  } else {
+      await axios.patch('/editmeal', {
+        shopname: item.shopname,
+        mealname: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      });
+    }
 
+    item.isEditing = !item.isEditing;
+
+  } catch (error) {
+    console.log(error);
   }
-
 }
 
 const handleDelete = async (item) => {
-
+  await axios.post('/deletemeal', {
+    shopname: item.shopname,
+    mealname: item.name,
+  });
+  await loadShopMeals();
 }
 </script>
 

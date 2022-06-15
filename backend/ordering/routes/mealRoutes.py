@@ -30,7 +30,7 @@ def getMealByShopname(shopname):
     return mealListSchema.jsonify(mealData)
 
 
-@app.route('/deletemeal', methods=['DELETE'])
+@app.route('/deletemeal', methods=['POST'])
 def deleteMealFromShop():
     shopname = request.json['shopname']
     mealname = request.json['mealname']
@@ -42,7 +42,7 @@ def deleteMealFromShop():
     return mealSchema.jsonify(mealData)
 
 
-@app.route('/editmeal', methods=['PUT'])
+@app.route('/editmeal', methods=['PATCH'])
 def editMealProperties():
     shopname = request.json['shopname']
     mealname = request.json['mealname']

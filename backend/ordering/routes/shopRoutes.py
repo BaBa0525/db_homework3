@@ -139,19 +139,7 @@ def shopRegister():
         return ({'message': 'The given data was invalid.', 'error': 'The shopname has been registered.'}, BAD_REQUEST)
 
 
-
-@app.route('/getshop/<account>', methods=['GET'])
-def getShopFromUser(account):
-    userData = User.query.get(account)
-
-    if userData is None or userData.role == 'user':
-        return ({'message': 'The given data was invalid.', 'error': 'The user is not owner yet.'}, BAD_REQUEST)
-
-    shopData = Shop.query.get(userData.shopname)
-    return shopSchema.jsonify(shopData)
-
-
-@app.route('/getshopname/<shopname>', methods=['GET'])
+@app.route('/getshop/<shopname>', methods=['GET'])
 def getShopByShopname(shopname):
     shopData = Shop.query.get(shopname)
 

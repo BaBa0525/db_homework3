@@ -49,10 +49,28 @@ const emits = defineEmits(['close-popup'])
   background-color: var(--white-color);
   border-radius: 16px;
 
-  overflow-y: scroll;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
 
   &::-webkit-scrollbar {
-    display: none;
+    width: 16px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+    border-radius: 100px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 5px solid transparent;
+    border-radius: 100px;
+    background-color: darkgray;
+
+    &:hover {
+      background-color: gray;
+    }
+
+    background-clip: content-box;
   }
 
   .icon {

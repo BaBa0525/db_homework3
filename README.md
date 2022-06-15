@@ -20,13 +20,13 @@ Pages:
     - [x] Login Page
     - [x] Registration Page
 - [ ] Home 
-    - [ ] Navigation Sidebar {BaBa}
+    - [ ] Navigation Sidebar { BaBa }
         - [ ] Recharge
-    - [ ] Search Page {Alan}
+    - [ ] Search Page { Alan }
         - [ ] Menu
-    - [ ] Shop Management Page
+    - [x] Shop Management Page
         - [x] Shop Registration
-        - [ ] Shop Meals Editing
+        - [x] Shop Meals Editing
     - [ ] User Order Page
         - [ ] Order Detail
     - [ ] Shop Order Page
