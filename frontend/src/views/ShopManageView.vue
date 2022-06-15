@@ -1,31 +1,32 @@
 <template>
   <BaseRowForm @submit.prevent="handleRegister" buttonText="Register"
-    :disableButton="isUserHasShop || shopv$.$error || shopv$.$errors.length > 0">
-    <BaseInput :disabled="isUserHasShop" v-model="shopState.shopname" placeholder="Shop Name"
+    :disableButton="userStore.isOwner || shopv$.$error || shopv$.$errors.length > 0">
+    <BaseInput :disabled="userStore.isOwner" v-model="shopState.shopname" placeholder="Shop Name"
       :hasError="shopv$.shopname.$error" :errors="shopv$.shopname.$errors" id="shopname" type="text"
       @blur="shopv$.shopname.$touch" />
-    <BaseInput :disabled="isUserHasShop" v-model="shopState.category" placeholder="Category"
+    <BaseInput :disabled="userStore.isOwner" v-model="shopState.category" placeholder="Category"
       :hasError="shopv$.category.$error" :errors="shopv$.category.$errors" id="category" type="text"
       @blur="shopv$.category.$touch" />
-    <BaseInput :disabled="isUserHasShop" v-model="shopState.latitude" placeholder="Latitude"
+    <BaseInput :disabled="userStore.isOwner" v-model="shopState.latitude" placeholder="Latitude"
       :hasError="shopv$.latitude.$error" :errors="shopv$.latitude.$errors" id="latitude" type="text"
       @blur="shopv$.latitude.$touch" />
-    <BaseInput :disabled="isUserHasShop" v-model="shopState.longitude" placeholder="Longitude"
+    <BaseInput :disabled="userStore.isOwner" v-model="shopState.longitude" placeholder="Longitude"
       :hasError="shopv$.longitude.$error" :errors="shopv$.longitude.$errors" id="longitude" type="text"
       @blur="shopv$.longitude.$touch" />
   </BaseRowForm>
 
   <BaseRowForm @submit.prevent="handleAddMeal" buttonText="Add"
-    :disableButton="!isUserHasShop || mealv$.$error || mealv$.$errors.length > 0">
-    <BaseInput :disabled="!isUserHasShop" v-model="mealState.mealname" placeholder="Meal Name"
+    :disableButton="!userStore.isOwner || mealv$.$error || mealv$.$errors.length > 0">
+    <BaseInput :disabled="!userStore.isOwner" v-model="mealState.mealname" placeholder="Meal Name"
       :hasError="mealv$.mealname.$error" :errors="mealv$.mealname.$errors" id="mealname" type="text"
       @blur="mealv$.mealname.$touch" />
-    <BaseInput :disabled="!isUserHasShop" v-model="mealState.price" placeholder="Price" :hasError="mealv$.price.$error"
-      :errors="mealv$.price.$errors" id="price" type="text" @blur="mealv$.price.$touch" />
-    <BaseInput :disabled="!isUserHasShop" v-model="mealState.quantity" placeholder="Quantity"
+    <BaseInput :disabled="!userStore.isOwner" v-model="mealState.price" placeholder="Price"
+      :hasError="mealv$.price.$error" :errors="mealv$.price.$errors" id="price" type="text"
+      @blur="mealv$.price.$touch" />
+    <BaseInput :disabled="!userStore.isOwner" v-model="mealState.quantity" placeholder="Quantity"
       :hasError="mealv$.quantity.$error" :errors="mealv$.quantity.$errors" id="quantity" type="text"
       @blur="mealv$.quantity.$touch" />
-    <FileInput :disabled="!isUserHasShop" :hasError="mealv$.image.$error" :errors="mealv$.image.$errors" id="image"
+    <FileInput :disabled="!userStore.isOwner" :hasError="mealv$.image.$error" :errors="mealv$.image.$errors" id="image"
       accept="image/*" @change="handleImageChange" />
   </BaseRowForm>
 
@@ -68,6 +69,7 @@ import useVuelidate from '@vuelidate/core';
 import { required, decimal, between, helpers, minValue } from '@vuelidate/validators';
 
 const userStore = useUserStore();
+userStore.reload();
 
 const shopState = reactive({
   shopname: '',
@@ -144,13 +146,12 @@ const handleRegister = async () => {
       account: userStore.account,
     });
     alert('Registration succeed!');
+    userStore.reload();
     router.go(0);
   } catch (error) {
     console.log(error);
   }
 }
-
-const isUserHasShop = computed(() => (shopState.shopname.length > 0));
 
 const mealState = reactive({
   mealname: '',

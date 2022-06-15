@@ -61,7 +61,7 @@ const handleSubmit = async () => {
     const response = await axios.post('/login', { ...state });
     alert('Login successfully!');
     store.$state = response.data;
-    router.push({ name: 'home' });
+    router.push({ name: 'search' });
   } catch {
     alert('Login failed!');
     state.password = state.confirm = '';
