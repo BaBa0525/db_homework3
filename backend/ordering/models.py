@@ -52,3 +52,27 @@ class Meal(db.Model):
         self.price = price
         self.quantity = quantity
 
+class Order(db.Model):
+    __tablename__ = 'order'
+    ID = db.Column(db.Integer, primary_key=True)
+    buyer = db.Column(db.String(255), db.ForeignKey('users.account')) # account
+    meal = db.Column(db.String(255))
+    shopname = db.Column(db.String(255), db.ForeignKey('shops.shopname'))
+    price = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(255))
+    starttime = db.Column(db.String(255))
+    endtime = db.Column(db.String(255))
+    taking = db.Column(db.String(255))
+    def __init__(self, buyer, meal, shopname, price, quantity, status, starttime, endtime, taking):
+        self.buyer = buyer
+        self.meal = meal
+        self.shopname = shopname
+        self.price = price
+        self.quantity = quantity
+        self.status = status
+        self.starttime = starttime
+        self.endtime = endtime
+        self.taking = taking
+
+    
