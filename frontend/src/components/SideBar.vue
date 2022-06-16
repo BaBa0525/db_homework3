@@ -7,13 +7,13 @@
       </span>
       <span v-else>Fooder <br/>Eats</span>
     </h1>
+    <SideBarLink to="/profile" :icon="IconProfile">profile</SideBarLink>
     <SideBarLink to="/search" :icon="IconSearch">Search</SideBarLink>
     <SideBarLink to="/shop" :icon="IconShop">Shop</SideBarLink>
     <SideBarLink to="/myorder" :icon="IconMyorder">My Order</SideBarLink>
     <SideBarLink to="/shoporder" :icon="IconShoporder">Shop Order</SideBarLink>
     <SideBarLink to="/transaction" :icon="Transaction">Transaction Record</SideBarLink>
     <SideBarLink to="/signin" :icon="IconLogout" @click="userStore.logout">Logout</SideBarLink>
-    <SideBarLink to="/profile" :icon="IconLogout">profile</SideBarLink>
     
     <IconToggle class="toggle" :class="{ 'rotate-180' : !sidebarStore.collapsed}" @click="sidebarStore.toggle"/>
 
@@ -32,6 +32,7 @@ import IconShoporder from "./icons/IconShoporder.vue"
 import Transaction from "./icons/IconTransaction.vue"
 import SideBarLink from "./SideBarLink.vue";
 import IconLogout from "./icons/IconLogout.vue"
+import IconProfile from "./icons/IconProfile.vue";
 
 const userStore = useUserStore();
 const sidebarStore = useSidebarStore()
