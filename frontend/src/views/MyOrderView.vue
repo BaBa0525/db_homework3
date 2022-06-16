@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue';
+import { reactive, computed, ref } from 'vue';
 import { useUserStore } from '../stores/user';
 import axios from 'axios';
 import BaseDropDown from '../components/BaseDropDown.vue';
@@ -46,7 +46,7 @@ const orderfields = [
     { key: 'Action', sortable: false },
 ];
 
-const orders = reactive([]);
+const orders = ref([]);
 
 const userStore = useUserStore();
 
@@ -71,7 +71,7 @@ const cancelOrder = async (item) => {
 const loadOrders = async () => {
     try {
         const response = await axios.get(`/getorder/${userStore.account}`);
-        orders = response.data;
+        orders.value = response.data;
     }
     catch (error) {
         console.log(error);

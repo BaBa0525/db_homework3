@@ -76,7 +76,6 @@ import BaseRowForm from "../components/BaseRowForm.vue";
 import BaseTable from "../components/BaseTable.vue";
 import PopupModal from "../components/PopupModal.vue";
 import router from "../router";
-import haversine from "haversine";
 
 const options = ['near', 'middle', 'far'];
 
@@ -226,13 +225,13 @@ const editQuantity = (item, quantity) => {
 }
 
 const handleCalculatePrice = () => {
-  orderMeals = meals.filter((item) => (item.orderQuantity > 0));
+  orderMeals.value = meals.filter((item) => (item.orderQuantity > 0));
   popupShop.active = false;
   popupOrder.active = true;
 }
 
 // order popup
-const orderMeals = reactive([]);
+const orderMeals = ref([]);
 
 const popupOrder = reactive({
   active: false,
