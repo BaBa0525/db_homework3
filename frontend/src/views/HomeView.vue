@@ -3,7 +3,7 @@
     <router-link to="shop"> Shop </router-link>
     <button @click="userStore.logout"> Logout </button> -->
     <SideBar></SideBar>
-    <div :style="{ 'margin-left': sidebarStore.sidebarWidth}">
+    <div class="view" :style="{ 'margin-left': `calc(${sidebarStore.sidebarWidth} + 2rem)`}">
         <router-view></router-view>
     </div>
 
@@ -18,5 +18,12 @@ const userStore = useUserStore();
 const sidebarStore = useSidebarStore()
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@import "@/styles/global.scss";
+
+.view{
+    @include flex;
+    justify-content: flex-start;
+
+}
 </style>
