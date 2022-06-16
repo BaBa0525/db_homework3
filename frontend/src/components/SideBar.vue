@@ -12,8 +12,9 @@
     <SideBarLink to="/myorder" :icon="IconMyorder">My Order</SideBarLink>
     <SideBarLink to="/shoporder" :icon="IconShoporder">Shop Order</SideBarLink>
     <SideBarLink to="/transaction" :icon="Transaction">Transaction Record</SideBarLink>
-
-
+    <SideBarLink to="/signin" :icon="IconLogout" @click="userStore.logout">Logout</SideBarLink>
+    <SideBarLink to="/profile" :icon="IconLogout">profile</SideBarLink>
+    
     <IconToggle class="toggle" :class="{ 'rotate-180' : !sidebarStore.collapsed}" @click="sidebarStore.toggle"/>
 
   </div>
@@ -22,6 +23,7 @@
 
 <script setup>
 import { useSidebarStore } from "../stores/sidebar"
+import { useUserStore } from '../stores/user';
 import IconToggle from "./icons/IconToggle.vue";
 import IconSearch from "./icons/IconSearch.vue"
 import IconShop from "./icons/IconShop.vue"
@@ -29,6 +31,9 @@ import IconMyorder from "./icons/IconMyorder.vue"
 import IconShoporder from "./icons/IconShoporder.vue"
 import Transaction from "./icons/IconTransaction.vue"
 import SideBarLink from "./SideBarLink.vue";
+import IconLogout from "./icons/IconLogout.vue"
+
+const userStore = useUserStore();
 const sidebarStore = useSidebarStore()
 </script>
 
@@ -63,6 +68,7 @@ const sidebarStore = useSidebarStore()
       transition: 1s linear;
     }
   }
+
 }
 
 
