@@ -78,24 +78,20 @@ def updateLocationOfUser():
     latitude  = request.json['latitude']
     longitude = request.json['longitude']
 
-    if (userData := User.query.filter_by(account=account)) is None:
-        return ERROR_USER_NOT_EXISTS
-    
+    userData = User.query.filter_by(account=account)
     userData.update({'latitude': latitude, 'longitude': longitude})
 
     db.session.commit()
     return userSchema.jsonify(userData)
 
 
-@app.route('/recharge', methods=['PUT'])
+@app.route('/recharge', methods=['PATCH'])
 def recharge():
     account = request.json['account']
-    value = request.json['value']
+    value = int(request.json['value'])
 
-    if (userData := User.query.filter_by(account=account)) is None:
-        return ERROR_USER_NOT_EXISTS
-
-    userData.update({ 'balance': userData.balance + value })
+    userData = User.query.filter_by(account=account)
+    userData.update({ 'balance': userData.first().balance + value })
     
     db.session.commit()
     return userSchema.jsonify(userData)
