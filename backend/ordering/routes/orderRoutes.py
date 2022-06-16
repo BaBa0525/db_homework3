@@ -1,14 +1,15 @@
-from flask import request
+from flask import request, jsonify
 from sqlalchemy import func
 from http.client import BAD_REQUEST, OK
 from datetime import datetime
 
 from ordering import app, db, distance
 from ordering.models import *
-from ordering.schema import OrderSchema
+from ordering.schema import OrderDetailSchema, OrderSchema
 
 orderSchema = OrderSchema()
 orderListSchema = OrderSchema(many=True)
+orderDetailListSchema = OrderDetailSchema(many=True)
 
 @app.route('/cancelorder', methods=['POST'])
 def cancelOrder():
@@ -20,11 +21,23 @@ def cancelOrder():
 
 @app.route('/getorder/<account>', methods=['GET'])
 def getOrder(account):
-    orderData = Order.query.filter_by(buyer=account)
+    orderData = Order.query.filter_by(customer=account)
     return orderListSchema.jsonify(orderData)
 
 
-@app.route('/createOrder', methods=['POST'])
+@app.route('/getorderdetail/<OID>', methods=['GET'])
+def getOrderDetail(OID):
+    orderDetails = OrderDetail.query.filter_by(OID=OID)
+
+    orderDetailList = orderDetails.all()
+    result = [{
+            'detail': detail,
+            'image': Meal.query.get((detail.shopname, detail.mealname)).with_entities(Meal.image)
+        } for detail in orderDetailList]
+
+    return jsonify(result)
+
+@app.route('/addorder', methods=['POST'])
 def createOrder():
     account = request.json['account']
     shopname = request.json['shopname']

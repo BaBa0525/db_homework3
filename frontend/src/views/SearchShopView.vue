@@ -1,20 +1,30 @@
 <template>
-  <BaseRowForm @submit.prevent="handleSubmit" button-text="Search" :disableButton="v$.$error || v$.$errors.length > 0">
-    <BaseInput v-model="state.shopname" placeholder="Shop Name" :hasError="v$.shopname.$error"
-      :errors="v$.shopname.$errors" id="shopname" type="text" @blur="v$.shopname.$touch" />
-    <BaseDropDown v-model="state.distance" placeholder="Distance" :hasError="v$.distance.$error"
-      :errors="v$.distance.$errors" id="distance" :options="options" @blur="v$.distance.$touch" />
-    <BaseInput v-model="state.pricelow" placeholder="Price Low" :hasError="v$.pricelow.$error"
-      :errors="v$.pricelow.$errors" id="pricelow" type="text" @blur="v$.pricelow.$touch" />
-    <BaseInput v-model="state.pricehigh" placeholder="Price High" :hasError="v$.pricehigh.$error"
-      :errors="v$.pricehigh.$errors" id="pricehigh" type="text" @blur="v$.pricehigh.$touch" />
-    <BaseInput v-model="state.category" placeholder="Category" :hasError="v$.category.$error"
-      :errors="v$.category.$errors" id="category" type="text" @blur="v$.category.$touch" />
-    <BaseInput v-model="state.meal" placeholder="Meal" :hasError="v$.meal.$error" :errors="v$.meal.$errors" id="meal"
-      type="text" @blur="v$.meal.$touch" />
-  </BaseRowForm>
+  <div class="form-container"
+    :style="{ 'margin': '0 auto', 'max-width': `calc(100% - ${sidebar.sidebarWidth} - 4rem)` }">
+    <BaseRowForm @submit.prevent="handleSubmit" button-text="Search"
+      :disableButton="v$.$error || v$.$errors.length > 0">
+      <BaseInput v-model="state.shopname" placeholder="Shop Name" :hasError="v$.shopname.$error"
+        :errors="v$.shopname.$errors" id="shopname" type="text" :styling="{ width: `calc(100% / 7)` }"
+        @blur="v$.shopname.$touch" />
+      <BaseDropDown v-model="state.distance" placeholder="Distance" :hasError="v$.distance.$error"
+        :errors="v$.distance.$errors" id="distance" :options="options" :styling="{ width: `calc(100% / 7)` }"
+        @blur="v$.distance.$touch" />
+      <BaseInput v-model="state.pricelow" placeholder="Price Low" :hasError="v$.pricelow.$error"
+        :errors="v$.pricelow.$errors" id="pricelow" type="text" :styling="{ width: `calc(100% / 7)` }"
+        @blur="v$.pricelow.$touch" />
+      <BaseInput v-model="state.pricehigh" placeholder="Price High" :hasError="v$.pricehigh.$error"
+        :errors="v$.pricehigh.$errors" id="pricehigh" type="text" :styling="{ width: `calc(100% / 7)` }"
+        @blur="v$.pricehigh.$touch" />
+      <BaseInput v-model="state.category" placeholder="Category" :hasError="v$.category.$error"
+        :errors="v$.category.$errors" id="category" type="text" :styling="{ width: `calc(100% / 7)` }"
+        @blur="v$.category.$touch" />
+      <BaseInput v-model="state.meal" placeholder="Meal" :hasError="v$.meal.$error" :errors="v$.meal.$errors" id="meal"
+        type="text" :styling="{ width: `calc(100% / 7)` }" @blur="v$.meal.$touch" />
+    </BaseRowForm>
+  </div>
 
-  <div class="table-container">
+  <div class="table-container"
+    :style="{ 'margin': '0 auto', 'max-width': `calc(100% - ${sidebar.sidebarWidth} - 4rem)` }">
     <BaseTable :fields="shopsField" :items="shops" @sort-by="handleSorting">
       <template #cell(action)="{ item }">
         <button type="button" @click="handleTogglePopup(item)">Open Menu</button>
@@ -35,13 +45,13 @@
         <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
       </template>
       <template #cell(order)="{ item }">
-        <button type="button" @click="editQuantity(item, 1)">+</button>
-        <span>{{ item.quantity }}</span>
-        <button type="button" @click="editQuantity(item, -1)">-</button>
+        <button type="button" :disabled="item.orderQuantity >= item.quantity" @click="editQuantity(item, 1)">+</button>
+        <span>{{ item.orderQuantity }}</span>
+        <button type="button" :disabled="item.orderQuantity <= 0" @click="editQuantity(item, -1)">-</button>
       </template>
     </BaseTable>
-    <BaseDropDown v-model="type" :labels="typeOption"></BaseDropDown>
-    <button type="button" @click="handleCalculatePrice()">Calculate Price</button>
+    <BaseDropDown v-model="type" :options="typeOption"></BaseDropDown>
+    <button type="button" :disabled="isOrderEmpty" @click="handleCalculatePrice()">Calculate Price</button>
   </PopupModal>
 
   <!-- order -->
@@ -54,11 +64,11 @@
     </BaseTable>
     <div class="totalprice">
       <p>Subtotal ${{ subtotal }}</p>
-      <p>Delivery Fee ${{ deliveryFee }}</p>
+      <p>Delivery Fee ${{ deliverFee }}</p>
       <hr>
-      <p>Total Price ${{ subtotal + deliveryFee }}</p>
+      <p>Total Price ${{ subtotal + deliverFee }}</p>
     </div>
-    <button type="button" :disable="userStore.balance < (subtotal + deliveryFee)" @click="handleOrder">Order</button>
+    <button type="button" :disable="userStore.balance < (subtotal + deliverFee)" @click="handleOrder">Order</button>
   </PopupModal>
 </template>
 
@@ -67,6 +77,7 @@ import { ref, reactive, computed } from "vue";
 import useVuelidate from "@vuelidate/core";
 import { decimal, alphaNum, minValue, helpers } from "@vuelidate/validators";
 import { useUserStore } from "@/stores/user";
+import { useSidebarStore } from "../stores/sidebar";
 import axios from "axios";
 import haversine from "haversine";
 import BaseInput from "../components/BaseInput.vue";
@@ -75,9 +86,9 @@ import BaseDropDown from "../components/BaseDropDown.vue";
 import BaseRowForm from "../components/BaseRowForm.vue";
 import BaseTable from "../components/BaseTable.vue";
 import PopupModal from "../components/PopupModal.vue";
-import router from "../router";
 
 const options = ['near', 'middle', 'far'];
+const sidebar = useSidebarStore();
 
 const state = reactive({
   shopname: '',
@@ -218,7 +229,7 @@ const mealsField = [
 
 const typeOption = ['Delivery', 'Pickup'];
 
-const type = reactive('Delivery');
+const type = ref('Delivery');
 
 const editQuantity = (item, quantity) => {
   item.orderQuantity += quantity;
@@ -235,6 +246,26 @@ const orderMeals = ref([]);
 
 const popupOrder = reactive({
   active: false,
+});
+
+const subtotal = computed(() => {
+  let subtotal = 0;
+  for (const meal of orderMeals.value) {
+    subtotal += meal.price * meal.orderQuantity;
+  }
+  return subtotal;
+});
+
+const deliverFee = computed(() => {
+  const dist = shops.filter((item) => (item.shopname === popupShop.shopname))[0].distance;
+  console.log(type.value);
+  if (type.value === 'Pickup') {
+    console.log('pickup');
+    return 0;
+  }
+  else {
+    return Math.round(Math.max(10, (dist / 1000) * 10));
+  }
 });
 
 const handleOrder = async () => {
@@ -254,34 +285,30 @@ const orderField = [
   { key: 'picture', sortable: false },
   { key: 'name', sortable: false },
   { key: 'price', sortable: false },
-  { key: 'quantity', sortable: false },
+  { key: 'orderQuantity', sortable: false },
 ];
 
-const subtotal = computed(() => {
-  let subtotal = 0;
-  for (const meal of orderMeals) {
-    subtotal += meal.price * meal.orderQuantity;
+const isOrderEmpty = computed(() => {
+  let isEmpty = true;
+  for (const meal of meals) {
+    if (meal.orderQuantity > 0) {
+      isEmpty = false;
+      break;
+    }
   }
-  return subtotal;
+  return isEmpty;
 });
-
-const deliverFee = computed(() => {
-  dist = shops.filter((item) => (item.shopname === popupShop.shopname))[0].distance;
-  if (type === 'pickup') {
-    return 0;
-  }
-  else {
-    return Math.round(Math.max(10, dist * 10)); // distance not implemented
-  }
-})
-
-
 
 </script>
 
 
 <style scoped lang="scss">
 @import "@/styles/global.scss";
+
+.form-container {
+  position: absolute;
+  top: 5%;
+}
 
 button {
   border: none;
