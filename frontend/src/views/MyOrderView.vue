@@ -6,7 +6,7 @@
             <button type="button" @click="showDetail(item)">Order Details</button>
         </template>
         <template #cell(action)="{ item }">
-            <button type="button" @click="cancelOrder(item)">Cancel</button>
+            <button type="button" :show="item.status === 'Not finished'" @click="cancelOrder(item)">Cancel</button>
         </template>
     </BaseTable>
 
@@ -15,9 +15,9 @@
         <BaseTable :fields="popupFields" :items="getOrderDetail()"></BaseTable>
         <div class="totalprice">
             <p>Subtotal ${{ subtotal }}</p>
-            <p>Delivery Fee ${{ deliveryFee }}</p>
+            <p>Delivery Fee ${{ deliverFee }}</p>
             <hr>
-            <p>Total Price ${{ subtotal + deliveryFee }}</p>
+            <p>Total Price ${{ subtotal + deliverFee }}</p>
         </div>
     </PopupModal>
 </template>
@@ -36,14 +36,14 @@ const state = reactive({
 
 const options = ['All', 'Finished', 'Not Finished', 'cancel'];
 const orderfields = [
-    { key: 'Order ID', sortable: false },
-    { key: 'Status', sortable: false },
-    { key: 'Start', sortable: false },
-    { key: 'End', sortable: false },
-    { key: 'Shop Name', sortable: false },
-    { key: 'Total Price', sortable: false },
-    { key: 'Order Details', sortable: false },
-    { key: 'Action', sortable: false },
+    { key: 'OID', sortable: false },
+    { key: 'status', sortable: false },
+    { key: 'startTime', sortable: false },
+    { key: 'endTime', sortable: false },
+    { key: 'shopname', sortable: false },
+    { key: 'subtotal', sortable: false },
+    { key: 'detail', sortable: false },
+    { key: 'action', sortable: false },
 ];
 
 const orders = ref([]);
@@ -62,7 +62,7 @@ const showDetail = (item) => {
 }
 
 const cancelOrder = async (item) => {
-    await axios.delete('/cancelorder', {
+    await axios.post('/cancelorder', {
         orderID: item.OID,
     });
     await loadOrders();
@@ -79,27 +79,29 @@ const loadOrders = async () => {
 }
 
 const popupFields = [
-    { key: 'Picture', sortable: false },
-    { key: 'Meal Name', sortable: false },
-    { key: 'Price', sortable: false },
-    { key: 'Quantity', sortable: false },
+    { key: 'picture', sortable: false },
+    { key: 'mealname', sortable: false },
+    { key: 'price', sortable: false },
+    { key: 'quantity', sortable: false },
 ];
 
 const getOrderDetail = async (item) => {
-
+    try {
+        const response = await axios.get(`/getorderdetail/${item.OID}`);
+        popupDetail.orderDetail = response.data;
+        return response.data;
+    }
+    catch (error) {
+        console.log(error);
+    }
 }
 
 const subtotal = computed(() => {
     return popupDetail.order.subtotal;
 });
 
-const deliveryFee = computed(() => {
-    if (popupDetail.order.type === 'pickup') {
-        return 0;
-    }
-    else {
-        return Math.round(Math.max(10, popupDetail.order.distance * 10));
-    }
+const deliverFee = computed(() => {
+    return popupDetail.order.deliverFee;
 })
 
 </script>
