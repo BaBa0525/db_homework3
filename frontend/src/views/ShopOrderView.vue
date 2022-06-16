@@ -35,15 +35,16 @@ const state = reactive({
 })
 
 const options = ['All', 'Finished', 'Not Finished', 'cancel'];
+
 const orderfields = [
-    { key: 'Order ID', sortable: false },
-    { key: 'Status', sortable: false },
-    { key: 'Start', sortable: false },
-    { key: 'End', sortable: false },
-    { key: 'Shop Name', sortable: false },
-    { key: 'Total Price', sortable: false },
-    { key: 'Order Details', sortable: false },
-    { key: 'Action', sortable: false },
+    { key: 'OID', sortable: false },
+    { key: 'status', sortable: false },
+    { key: 'startTime', sortable: false },
+    { key: 'endTime', sortable: false },
+    { key: 'shopname', sortable: false },
+    { key: 'subtotal', sortable: false },
+    { key: 'detail', sortable: false },
+    { key: 'action', sortable: false },
 ];
 
 const orders = ref([]);
