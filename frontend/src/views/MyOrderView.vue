@@ -85,20 +85,20 @@ const popupFields = [
     { key: 'Quantity', sortable: false },
 ];
 
-const getOrderDetail = (item) => {
+const getOrderDetail = async (item) => {
 
 }
 
 const subtotal = computed(() => {
-    return popupDetail.order.price;
+    return popupDetail.order.subtotal;
 });
 
 const deliveryFee = computed(() => {
-    if (popupDetail.order.taking === 'pickup') {
+    if (popupDetail.order.type === 'pickup') {
         return 0;
     }
     else {
-        // return Math.round(Math.max(10, popupDetail.order.distance * 10));
+        return Math.round(Math.max(10, popupDetail.order.distance * 10));
     }
 })
 

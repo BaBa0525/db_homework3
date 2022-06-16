@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <SideBar></SideBar>
-    <div :style="{ 'margin-left': sidebarStore.sidebarWidth }">
-      <router-view></router-view>
+    <div class="view" :style="{ 'margin-left': `calc(${sidebarStore.sidebarWidth} + 2rem)`}">
+        <router-view></router-view>
     </div>
   </div>
 </template>
@@ -19,8 +19,8 @@ const sidebarStore = useSidebarStore()
 <style scoped lang="scss">
 @import "@/styles/global.scss";
 
-.container {
-  @include flex;
-
+.view{
+    @include flex;
+    justify-content: flex-start;
 }
 </style>

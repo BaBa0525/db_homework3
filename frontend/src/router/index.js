@@ -50,6 +50,11 @@ const router = createRouter({
           name: 'transaction',
           path: '/transaction',
           component: () => import('../views/TransactionRecordView.vue'),
+        },
+        {
+          name: 'profile',
+          path: '/profile',
+          component: () => import('../views/ProfileView.vue'),
         }
       ]
     }
