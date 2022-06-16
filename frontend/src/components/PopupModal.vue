@@ -5,6 +5,8 @@
   <transition name="slide" appear>
     <div class="modal" v-if="show">
       <IconExitPopup class="icon" @click="$emit('close-popup')"></IconExitPopup>
+      <h1>{{titles}}</h1>
+      <hr/>
       <slot></slot>
     </div>
   </transition>
@@ -15,9 +17,13 @@ import IconExitPopup from './icons/IconExitPopup.vue';
 
 const props = defineProps({
   show: {
-    Type: Boolean,
+    type: Boolean,
     default: false,
   },
+  titles: {
+    type: String,
+    default: '',
+  }
 });
 
 const emits = defineEmits(['close-popup'])
@@ -51,6 +57,17 @@ const emits = defineEmits(['close-popup'])
 
   overflow-y: auto;
   scrollbar-gutter: stable;
+
+  h1{
+    align-self: flex-start;
+    transform: translateY(-50%);
+  }
+
+  hr{
+    width: 100%;
+    border: 2px solid gray;
+    transform: translateY(-2rem);
+  }
 
   &::-webkit-scrollbar {
     width: 16px;
