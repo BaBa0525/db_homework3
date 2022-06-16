@@ -1,0 +1,69 @@
+<template>
+  <div class="sidebar" :style="{width: sidebarStore.sidebarWidth}">
+    <h1>
+      <span v-if="sidebarStore.collapsed">
+        <div>F</div>
+        <div>E</div>
+      </span>
+      <span v-else>Fooder <br/>Eats</span>
+    </h1>
+    <SideBarLink to="/search" :icon="IconSearch">Search</SideBarLink>
+    <SideBarLink to="/shop" :icon="IconShop">Shop</SideBarLink>
+    <SideBarLink to="/myorder" :icon="IconMyorder">My Order</SideBarLink>
+    <SideBarLink to="/shoporder" :icon="IconShoporder">Shop Order</SideBarLink>
+    <SideBarLink to="/transaction" :icon="Transaction">Transaction Record</SideBarLink>
+
+
+    <IconToggle class="toggle" :class="{ 'rotate-180' : !sidebarStore.collapsed}" @click="sidebarStore.toggle"/>
+
+  </div>
+
+</template>
+
+<script setup>
+import { useSidebarStore } from "../stores/sidebar"
+import IconToggle from "./icons/IconToggle.vue";
+import IconSearch from "./icons/IconSearch.vue"
+import IconShop from "./icons/IconShop.vue"
+import IconMyorder from "./icons/IconMyorder.vue"
+import IconShoporder from "./icons/IconShoporder.vue"
+import Transaction from "./icons/IconTransaction.vue"
+import SideBarLink from "./SideBarLink.vue";
+const sidebarStore = useSidebarStore()
+</script>
+
+
+
+<style scoped lang="scss">
+.sidebar {
+  color: rgb(255, 255, 255);
+  background-color: var(--sidebar-bg-color);
+  float: left;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  padding: 0.5em;
+  transition: 0.5s ease;
+  display: flex;
+  flex-direction: column;
+
+  .toggle{
+    position: absolute;
+    bottom: 0;
+    padding: 0.75em;
+
+    color: rgba(255, 255, 255, 0.7);
+
+    transition: 0.2s linear;
+
+    &.rotate-180 {
+      transform: rotate(180deg);
+      transition: 1s linear;
+    }
+  }
+}
+
+
+</style>
