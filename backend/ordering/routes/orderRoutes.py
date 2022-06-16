@@ -95,14 +95,14 @@ def createOrder():
             
             if (modifiedQuantity := mealData.first().quantity - mealQuantity) < 0:
                 db.session.rollback()
-                return ({ 'message': 'The given data was invalid.', 'error': 'Invalid quantity.' }, BAD_REQUEST)
+                return ({ 'message': 'Not enough meal quantity.' }, BAD_REQUEST)
 
             mealData.update({ 'quantity': modifiedQuantity })
 
 
             if (modifiedUserBalance := user.balance - mealSubtotal) < 0:
                 db.session.rollback()
-                return ({ 'message': 'The given data was invalid.', 'error': 'Not enough balance.' }, BAD_REQUEST)
+                return ({ 'message': 'Not enough balance.' }, BAD_REQUEST)
 
             userQuery.update({ 'balance': modifiedUserBalance })
 
