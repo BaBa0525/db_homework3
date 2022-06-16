@@ -27,6 +27,7 @@
       @click="handleChangePage(pageNumber)">{{ pageNumber }}</li>
   </ul>
 
+  <!-- menu -->
   <PopupModal :show="popupShop.active" @close-popup="popupShop.active = false">
     <h1>Menu of {{ popupShop.shopname }}</h1>
     <BaseTable :fields="mealsField" :items="meals">
@@ -34,9 +35,30 @@
         <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
       </template>
       <template #cell(order)="{ item }">
-        <button type="button" @click="addToOrder(item)">Order</button>
+        <button type="button" @click="editQuantity(item, 1)">+</button>
+        <span>{{ item.quantity }}</span>
+        <button type="button" @click="editQuantity(item, -1)">-</button>
       </template>
     </BaseTable>
+    <BaseDropDown v-model="type" :labels="typeOption"></BaseDropDown>
+    <button type="button" @click="handleCalculatePrice()">Calculate Price</button>
+  </PopupModal>
+
+  <!-- order -->
+  <PopupModal :show="popupOrder.active" @close-popup="popupOrder.active = false">
+    <h1>Order</h1>
+    <BaseTable :fields="orderField" :items="orderMeals">
+      <template #cell(picture)="{ item }">
+        <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
+      </template>
+    </BaseTable>
+    <div class="totalprice">
+      <p>Subtotal ${{ subtotal }}</p>
+      <p>Delivery Fee ${{ deliveryFee }}</p>
+      <hr>
+      <p>Total Price ${{ subtotal + deliveryFee }}</p>
+    </div>
+    <button type="button" :disable="userStore.balance < (subtotal + deliveryFee)" @click="handleOrder">Order</button>
   </PopupModal>
 </template>
 
@@ -53,6 +75,8 @@ import BaseDropDown from "../components/BaseDropDown.vue";
 import BaseRowForm from "../components/BaseRowForm.vue";
 import BaseTable from "../components/BaseTable.vue";
 import PopupModal from "../components/PopupModal.vue";
+import router from "../router";
+import haversine from "haversine";
 
 const options = ['near', 'middle', 'far'];
 
@@ -151,6 +175,7 @@ const handleChangePage = async (pageNumber) => {
 
 const popupShop = reactive({
   active: false,
+  shopname: '',
 });
 
 const meals = reactive([]);
@@ -167,6 +192,7 @@ const getMeals = async () => {
       meals.push({
         ...meal,
         index: indexCounter++,
+        orderQuantity: 0,
       });
     }
 
@@ -181,6 +207,7 @@ const handleTogglePopup = (item) => {
   getMeals();
 }
 
+// shop popup
 const mealsField = [
   { key: 'index', sortable: false },
   { key: 'picture', sortable: false },
@@ -190,10 +217,69 @@ const mealsField = [
   { key: 'order', sortable: false },
 ];
 
-const addToOrder = async () => {
-  alert('TODO: add to order');
+const typeOption = ['Delivery', 'Pickup'];
+
+const type = reactive('Delivery');
+
+const editQuantity = (item, quantity) => {
+  item.orderQuantity += quantity;
+}
+
+const handleCalculatePrice = () => {
+  orderMeals = meals.filter((item) => (item.orderQuantity > 0));
+  popupShop.active = false;
+  popupOrder.active = true;
+}
+
+// order popup
+const orderMeals = reactive([]);
+
+const popupOrder = reactive({
+  active: false,
+});
+
+const handleOrder = async () => {
+  await axios.post('/addorder', {
+    account: userStore.account,
+    shopname: popupShop.shopname,
+    meals: orderMeals,
+    type: type,
+    subtotal: subtotal,
+    deliverFee: deliverFee,
+  });
+  alert("Order Successfully");
+  popupOrder.active = false;
 };
+
+const orderField = [
+  { key: 'picture', sortable: false },
+  { key: 'name', sortable: false },
+  { key: 'price', sortable: false },
+  { key: 'quantity', sortable: false },
+];
+
+const subtotal = computed(() => {
+  let subtotal = 0;
+  for (const meal of orderMeals) {
+    subtotal += meal.price * meal.orderQuantity;
+  }
+  return subtotal;
+});
+
+const deliverFee = computed(() => {
+  dist = shops.filter((item) => (item.shopname === popupShop.shopname))[0].distance;
+  if (type === 'pickup') {
+    return 0;
+  }
+  else {
+    return Math.round(Math.max(10, dist * 10)); // distance not implemented
+  }
+})
+
+
+
 </script>
+
 
 <style scoped lang="scss">
 @import "@/styles/global.scss";
