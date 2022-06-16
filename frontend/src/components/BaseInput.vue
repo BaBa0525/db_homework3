@@ -1,5 +1,5 @@
 <template>
-  <div class="input">
+  <div class="input" :style="styling">
     <input v-bind="$attrs" :value="modelValue" :class="{ 'filled': modelValue, 'danger': hasError }"
       @input="$emit('update:modelValue', $event.target.value)" />
     <label class="placeholder">
@@ -17,11 +17,11 @@
 const props = defineProps({
   modelValue: {
     type: [String, Number],
-    default: "",
+    default: '',
   },
   placeholder: {
     type: String,
-    default: "",
+    default: '',
   },
   hasError: {
     type: Boolean,
@@ -31,6 +31,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  styling: {
+    type: String,
+    default: '',
+  }
 });
 </script>
 
