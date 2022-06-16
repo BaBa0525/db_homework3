@@ -13,9 +13,26 @@ orderDetailSchema = OrderDetailSchema()
 @app.route('/cancelorder', methods=['POST'])
 def cancelOrder():
     orderID = request.json['orderID']
-    orderData = Order.query.get(orderID)
-    orderData.delete()
-    db.session.commit()
+
+    with db.session.begin():
+        orderData = Order.query.filter_by(OID=orderID)
+        orderDetails = OrderDetail.query.filter_by(OID=orderID)
+        transactions = Transaction.query.filter_by(OID=orderID)
+
+        for detail in orderDetails.all():
+            mealQuery = Meal.query.filter_by(shopname=detail.shopname, name=detail.mealname)
+            meal = mealQuery.first()
+            mealQuery.update({ 'quantity': meal.quantity + detail.quantity })
+        
+        for transaction in transactions.all():
+            userQuery = User.query.filter_by(account=transaction.account)
+            user = userQuery.first()
+            userQuery.update({ 'balance': user.balance + (-1 * transaction.amount) })
+
+        orderData.delete()
+        orderDetails.delete()
+        transactions.delete()
+
     return orderSchema.jsonify(orderData)
 
 @app.route('/getorder/<account>', methods=['GET'])
@@ -61,7 +78,7 @@ def createOrder():
         orderData = Order('Not finished', time, shopname, subtotal, deliverFee, account, method)
         db.session.add(orderData)
         db.session.flush()
-
+        
         # create all order details and modify other tables
         for meal in meals:
             mealName = meal['name']
@@ -89,8 +106,8 @@ def createOrder():
             owner = ownerQuery.first()
             ownerQuery.update({ 'balance': owner.balance + mealSubtotal })
 
-        userTransaction = Transaction(user.account, shopname, 'shop', 'Payment', time, -1 * (subtotal + deliverFee))
-        ownerTransaction = Transaction(owner.account, user.account, 'user', 'Receive', time, subtotal + deliverFee)
+        userTransaction = Transaction(orderData.OID, user.account, shopname, 'shop', 'Payment', time, -1 * (subtotal + deliverFee))
+        ownerTransaction = Transaction(orderData.OID, owner.account, user.account, 'user', 'Receive', time, subtotal + deliverFee)
         db.session.add_all([userTransaction, ownerTransaction])
     
     return ({ 'message': 'done' }, OK)

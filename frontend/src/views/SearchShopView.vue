@@ -59,7 +59,6 @@
 
   <!-- order -->
   <PopupModal :show="popupOrder.active" titles="Order" @close-popup="popupOrder.active = false">
-    <h1>Order</h1>
     <BaseTable :fields="orderField" :items="orderMeals">
       <template #cell(picture)="{ item }">
         <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>

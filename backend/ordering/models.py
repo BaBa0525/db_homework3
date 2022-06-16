@@ -96,6 +96,7 @@ class OrderDetail(db.Model):
 class Transaction(db.Model):
     __tablename__ = 'transaction'
     RID = db.Column(db.Integer, primary_key=True)
+    OID = db.Column(db.Integer, db.ForeignKey('order.OID'), nullable=False)
     account = db.Column(db.String(255), nullable=False)
     trader = db.Column(db.String(255), nullable=False)
     traderRole = db.Column(db.String(255), nullable=False)
@@ -103,7 +104,8 @@ class Transaction(db.Model):
     time = db.Column(db.DateTime, nullable=False)
     amount = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, account, trader , traderRole, action, time, amount):
+    def __init__(self, OID, account, trader , traderRole, action, time, amount):
+        self.OID = OID
         self.account = account
         self.trader = trader
         self.traderRole = traderRole
