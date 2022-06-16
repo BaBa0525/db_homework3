@@ -1,3 +1,4 @@
+from sqlalchemy import PrimaryKeyConstraint
 from ordering import db
 
 class User(db.Model):
@@ -96,7 +97,7 @@ class OrderDetail(db.Model):
 class Transaction(db.Model):
     __tablename__ = 'transaction'
     RID = db.Column(db.Integer, primary_key=True)
-    OID = db.Column(db.Integer, db.ForeignKey('order.OID'), nullable=False)
+    OID = db.Column(db.Integer, db.ForeignKey('order.OID'), nullable=True)
     account = db.Column(db.String(255), nullable=False)
     trader = db.Column(db.String(255), nullable=False)
     traderRole = db.Column(db.String(255), nullable=False)

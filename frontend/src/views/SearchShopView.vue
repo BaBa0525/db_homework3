@@ -200,7 +200,6 @@ const getMeals = async () => {
     let indexCounter = 1;
 
     for (const meal of mealsResponse) {
-      console.log(meal);
       meals.push({
         ...meal,
         index: indexCounter++,
@@ -213,10 +212,10 @@ const getMeals = async () => {
   }
 };
 
-const handleTogglePopup = (item) => {
+const handleTogglePopup = async (item) => {
   popupShop.active = true;
   popupShop.shopname = item.shopname;
-  getMeals();
+  await getMeals();
 }
 
 // shop popup
@@ -272,6 +271,14 @@ const deliverFee = computed(() => {
 
 const handleOrder = async () => {
   try {
+    console.log({
+      account: userStore.account,
+      shopname: popupShop.shopname,
+      meals: orderMeals.value,
+      type: type.value,
+      subtotal: subtotal.value,
+      deliverFee: deliverFee.value,
+    })
     await axios.post('/addorder', {
       account: userStore.account,
       shopname: popupShop.shopname,
