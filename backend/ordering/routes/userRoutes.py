@@ -1,14 +1,16 @@
 from flask import request
 from http.client import BAD_REQUEST
+from datetime import datetime
 
 from ordering import app, db
-from ordering.models import User
-from ordering.schema import UserSchema
+from ordering.models import User, Transaction
+from ordering.schema import UserSchema, TransactionSchema
 from ordering.routes import generateSalt, getHashed
 
 
 ERROR_USER_NOT_EXISTS =  ({ 'message': 'The given data was invalid.', 'error': 'The user does not exists.' }, BAD_REQUEST)
 userSchema = UserSchema()
+transactionListSchema = TransactionSchema(many=True)
 
 
 @app.route('/login', methods = ['POST'])
@@ -90,8 +92,29 @@ def recharge():
     account = request.json['account']
     value = int(request.json['value'])
 
-    userData = User.query.filter_by(account=account)
-    userData.update({ 'balance': userData.first().balance + value })
+    with db.session.begin():
+        userData = User.query.filter_by(account=account)
+        time = datetime.now()
+        user = userData.first()
+        userData.update({ 'balance': user.balance + value })
+        userTransaction = Transaction(None, user.account, user.account, 'user', 'Recharge', time, value)
+        db.session.add(userTransaction)
     
-    db.session.commit()
     return userSchema.jsonify(userData)
+
+
+@app.route('/transaction', methods = ['POST'])
+def getTransaction():
+    account = request.json['account']
+    action = request.json['action']
+    print(action, account)
+
+    if action == 'All':
+        transaction = Transaction.query.filter(db.or_(Transaction.account==account, Transaction.trader==account))
+    else:
+        transaction = Transaction.query.filter(db.or_(Transaction.account==account, Transaction.trader==account), Transaction.action==action)
+
+    if transaction is None:
+        return ERROR_USER_NOT_EXISTS
+    else:
+        return transactionListSchema.jsonify(transaction)

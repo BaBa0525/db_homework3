@@ -78,6 +78,7 @@ def createOrder():
         orderData = Order('Not finished', time, shopname, subtotal, deliverFee, account, method)
         db.session.add(orderData)
         db.session.flush()
+        print(orderData.OID)
         
         # create all order details and modify other tables
         for meal in meals:
@@ -86,7 +87,9 @@ def createOrder():
             mealQuantity = meal['orderQuantity']
             mealSubtotal = mealPrice * mealQuantity
 
-            db.session.add(OrderDetail(orderData.OID, shopname, mealName, mealPrice, mealQuantity))
+            Detail = OrderDetail(orderData.OID, shopname, mealName, mealPrice, mealQuantity)
+            print(Detail)
+            db.session.add(Detail)
 
             mealData = Meal.query.filter_by(name=mealName, shopname=shopname)
             
@@ -96,12 +99,14 @@ def createOrder():
 
             mealData.update({ 'quantity': modifiedQuantity })
 
+
             if (modifiedUserBalance := user.balance - mealSubtotal) < 0:
                 db.session.rollback()
                 return ({ 'message': 'The given data was invalid.', 'error': 'Not enough balance.' }, BAD_REQUEST)
 
             userQuery.update({ 'balance': modifiedUserBalance })
 
+            print("ya")
             ownerQuery = User.query.filter_by(shopname=shopname)
             owner = ownerQuery.first()
             ownerQuery.update({ 'balance': owner.balance + mealSubtotal })

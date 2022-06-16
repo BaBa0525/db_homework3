@@ -1,6 +1,13 @@
 <template>
-    <BaseDropDown v-model="state.action" id="action" :options="options" />
-    <BaseTable :fields="fields" :items="state.transaction"></BaseTable>
+    <BaseDropDown v-model="state.action" id="action" :options="options" @change="loadTransactions" />
+    <BaseTable :fields="fields" :items="state.transaction">
+        <template #cell(amount_change)="{ item }">
+          {{item.amount}}
+        </template>
+        <template #cell(record_ID)="{ item }">
+          {{item.RID}}
+        </template>
+    </BaseTable>
 </template>
 
 <script setup>
@@ -17,12 +24,29 @@ const state = reactive({
 
 const options = ['All', 'Payment', 'Recharge', 'Receive'];
 const fields = [
-    { key: 'Record ID', sortable: false },
-    { key: 'Action', sortable: false },
-    { key: 'Time', sortable: false },
-    { key: 'Trader', sortable: false },
-    { key: 'Amount change', sortable: false },
+    { key: 'record_ID', sortable: false },
+    { key: 'action', sortable: false },
+    { key: 'time', sortable: false },
+    { key: 'trader', sortable: false },
+    { key: 'amount_change', sortable: false },
 ]
+
+const userStore = useUserStore();
+
+
+const loadTransactions = async () => {
+  try {
+    const response = await axios.post('/transaction', {
+      account: userStore.account,
+      action:  state.action,
+    });
+    state.transaction = response.data;
+    
+  } catch (error) {
+    console.log(error);
+  }
+}
+loadTransactions()
 
 </script>
 

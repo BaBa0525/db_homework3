@@ -33,7 +33,7 @@ const props = defineProps({
   },
   styling: {
     type: Object,
-    default: () => ({}),
+    default: null,
   }
 });
 </script>

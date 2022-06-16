@@ -53,7 +53,7 @@ const handleSubmit = async () => {
   v$.value.$touch();
 
   if (v$.value.$error) {
-    state.password = state.confirm = '';
+    state.password = '';
     return;
   }
 
@@ -64,7 +64,7 @@ const handleSubmit = async () => {
     router.push({ name: 'search' });
   } catch {
     alert('Login failed!');
-    state.password = state.confirm = '';
+    state.password = '';
   }
 }
 </script>
