@@ -25,6 +25,7 @@
 <script setup>
 import { reactive, computed } from 'vue';
 import { useUserStore } from '../stores/user';
+import axios from 'axios';
 import BaseDropDown from '../components/BaseDropDown.vue';
 import BaseTable from '../components/BaseTable.vue';
 import PopupModal from "../components/PopupModal.vue";
@@ -51,6 +52,7 @@ const userStore = useUserStore();
 
 const popupDetail = reactive({
     active: false,
+    order: [],
     orderDetail: [],
 });
 
@@ -59,8 +61,21 @@ const showDetail = (item) => {
     popupDetail.order = item;
 }
 
-const cancelOrder = (item) => {
+const cancelOrder = async (item) => {
+    await axios.delete('/cancelorder', {
+        orderID: item.OID,
+    });
+    await loadOrders();
+}
 
+const loadOrders = async () => {
+    try {
+        const response = await axios.get(`/getorder/${userStore.account}`);
+        orders = response.data;
+    }
+    catch (error) {
+        console.log(error);
+    }
 }
 
 const popupFields = [
@@ -70,16 +85,21 @@ const popupFields = [
     { key: 'Quantity', sortable: false },
 ];
 
-const getOrderDetail = () => {
+const getOrderDetail = (item) => {
 
 }
 
 const subtotal = computed(() => {
-    let total = 0;
+    return popupDetail.order.price;
 });
 
 const deliveryFee = computed(() => {
-
+    if (popupDetail.order.taking === 'pickup') {
+        return 0;
+    }
+    else {
+        // return Math.round(Math.max(10, popupDetail.order.distance * 10));
+    }
 })
 
 </script>
