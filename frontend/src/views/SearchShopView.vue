@@ -38,8 +38,7 @@
   </ul>
 
   <!-- menu -->
-  <PopupModal :show="popupShop.active" @close-popup="popupShop.active = false">
-    <h1>Menu of {{ popupShop.shopname }}</h1>
+  <PopupModal :show="popupShop.active" :titles="`Menu of ${popupShop.shopname}`" @close-popup="popupShop.active = false">
     <BaseTable :fields="mealsField" :items="meals">
       <template #cell(picture)="{ item }">
         <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
@@ -55,7 +54,7 @@
   </PopupModal>
 
   <!-- order -->
-  <PopupModal :show="popupOrder.active" @close-popup="popupOrder.active = false">
+  <PopupModal :show="popupOrder.active" titles="Order" @close-popup="popupOrder.active = false">
     <h1>Order</h1>
     <BaseTable :fields="orderField" :items="orderMeals">
       <template #cell(picture)="{ item }">
