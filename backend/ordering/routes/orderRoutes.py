@@ -70,7 +70,7 @@ def createOrder():
             mealSubtotal = mealPrice * mealQuantity
 
             db.session.add(OrderDetail(orderData.OID, shopname, mealName, mealPrice, mealQuantity))
-            
+
             mealData = Meal.query.filter_by(name=mealName, shopname=shopname)
             
             if (modifiedQuantity := mealData.first().quantity - mealQuantity) < 0:
