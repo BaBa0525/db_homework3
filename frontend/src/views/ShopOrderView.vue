@@ -3,19 +3,21 @@
     <BaseDropDown v-model="state.status" id="status" :options="options" @change="loadOrders" />
 
     <BaseTable :fields="orderfields" :items="orders">
-      <template #cell(picture)="{ item }">
-        <BaseImage :src="item.image" :alt="item.mealname" width="100" height="100"></BaseImage>
-      </template>
       <template #cell(detail)="{ item }">
         <button type="button" @click="showDetail(item)">Order Details</button>
       </template>
       <template #cell(action)="{ item }">
-        <button type="button" :show="item.status === 'Not finished'" @click="cancelOrder(item)">Cancel</button>
+        <button type="button" v-if="item.status === 'Not finished'" @click="finishOrder(item)">Finish</button>
+        <button type="button" v-if="item.status === 'Not finished'" @click="cancelOrder(item)">Cancel</button>
       </template>
     </BaseTable>
 
     <PopupModal :show="popupDetail.active" titles="Order" @close-popup="popupDetail.active = false">
-      <BaseTable :fields="popupFields" :items="popupDetail.orderDetail"></BaseTable>
+      <BaseTable :fields="popupFields" :items="popupDetail.orderDetail">
+        <template #cell(picture)="{ item }">
+          <BaseImage :src="item.image" :alt="item.mealname" width="100" height="100" />
+        </template>
+      </BaseTable>
       <div class="totalprice">
         <p>Subtotal ${{ subtotal }}</p>
         <p>Delivery Fee ${{ deliverFee }}</p>
@@ -91,10 +93,12 @@ const loadOrders = async () => {
   catch (error) {
     console.log(error);
   }
+  console.log(orders.value);
 }
 loadOrders();
 
 const popupFields = [
+  { key: 'RID', sortable: false },
   { key: 'picture', sortable: false },
   { key: 'mealname', sortable: false },
   { key: 'price', sortable: false },
