@@ -98,13 +98,15 @@ class Transaction(db.Model):
     RID = db.Column(db.Integer, primary_key=True)
     account = db.Column(db.String(255), nullable=False)
     trader = db.Column(db.String(255), nullable=False)
+    traderRole = db.Column(db.String(255), nullable=False)
     action = db.Column(db.String(255), nullable=False)
     time = db.Column(db.DateTime, nullable=False)
     amount = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, account, trader, action, time, amount):
+    def __init__(self, account, trader , traderRole, action, time, amount):
         self.account = account
         self.trader = trader
+        self.traderRole = traderRole
         self.action = action
         self.time = time
         self.amount = amount

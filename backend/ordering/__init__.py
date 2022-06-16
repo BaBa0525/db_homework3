@@ -38,3 +38,4 @@ otherwise, it would cause error
 from ordering.routes import userRoutes
 from ordering.routes import shopRoutes
 from ordering.routes import mealRoutes
+from ordering.routes import orderRoutes
