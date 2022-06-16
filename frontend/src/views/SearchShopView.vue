@@ -35,13 +35,13 @@
         <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
       </template>
       <template #cell(order)="{ item }">
-        <button type="button" @click="editQuantity(item, 1)">+</button>
-        <span>{{ item.quantity }}</span>
-        <button type="button" @click="editQuantity(item, -1)">-</button>
+        <button type="button" :disabled="item.orderQuantity >= item.quantity" @click="editQuantity(item, 1)">+</button>
+        <span>{{ item.orderQuantity }}</span>
+        <button type="button" :disabled="item.orderQuantity <= 0" @click="editQuantity(item, -1)">-</button>
       </template>
     </BaseTable>
-    <BaseDropDown v-model="type" :labels="typeOption"></BaseDropDown>
-    <button type="button" @click="handleCalculatePrice()">Calculate Price</button>
+    <BaseDropDown v-model="type" :options="typeOption"></BaseDropDown>
+    <button type="button" :disabled="isOrderEmpty" @click="handleCalculatePrice()">Calculate Price</button>
   </PopupModal>
 
   <!-- order -->
@@ -54,11 +54,11 @@
     </BaseTable>
     <div class="totalprice">
       <p>Subtotal ${{ subtotal }}</p>
-      <p>Delivery Fee ${{ deliveryFee }}</p>
+      <p>Delivery Fee ${{ deliverFee }}</p>
       <hr>
-      <p>Total Price ${{ subtotal + deliveryFee }}</p>
+      <p>Total Price ${{ subtotal + deliverFee }}</p>
     </div>
-    <button type="button" :disable="userStore.balance < (subtotal + deliveryFee)" @click="handleOrder">Order</button>
+    <button type="button" :disable="userStore.balance < (subtotal + deliverFee)" @click="handleOrder">Order</button>
   </PopupModal>
 </template>
 
@@ -218,7 +218,7 @@ const mealsField = [
 
 const typeOption = ['Delivery', 'Pickup'];
 
-const type = reactive('Delivery');
+const type = ref('Delivery');
 
 const editQuantity = (item, quantity) => {
   item.orderQuantity += quantity;
@@ -235,6 +235,26 @@ const orderMeals = ref([]);
 
 const popupOrder = reactive({
   active: false,
+});
+
+const subtotal = computed(() => {
+  let subtotal = 0;
+  for (const meal of orderMeals.value) {
+    subtotal += meal.price * meal.orderQuantity;
+  }
+  return subtotal;
+});
+
+const deliverFee = computed(() => {
+  let dist = shops.filter((item) => (item.shopname === popupShop.shopname))[0].distance;
+  console.log(type.value);
+  if (type.value === 'Pickup') {
+    console.log('pickup');
+    return 0;
+  }
+  else {
+    return Math.round(Math.max(10, dist * 10)); // distance not implemented
+  }
 });
 
 const handleOrder = async () => {
@@ -254,28 +274,19 @@ const orderField = [
   { key: 'picture', sortable: false },
   { key: 'name', sortable: false },
   { key: 'price', sortable: false },
-  { key: 'quantity', sortable: false },
+  { key: 'orderQuantity', sortable: false },
 ];
 
-const subtotal = computed(() => {
-  let subtotal = 0;
-  for (const meal of orderMeals) {
-    subtotal += meal.price * meal.orderQuantity;
+const isOrderEmpty = computed(() => {
+  let isEmpty = true;
+  for (const meal of meals) {
+    if (meal.orderQuantity > 0) {
+      isEmpty = false;
+      break;
+    }
   }
-  return subtotal;
+  return isEmpty;
 });
-
-const deliverFee = computed(() => {
-  dist = shops.filter((item) => (item.shopname === popupShop.shopname))[0].distance;
-  if (type === 'pickup') {
-    return 0;
-  }
-  else {
-    return Math.round(Math.max(10, dist * 10)); // distance not implemented
-  }
-})
-
-
 
 </script>
 
