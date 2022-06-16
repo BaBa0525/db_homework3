@@ -32,8 +32,8 @@ const props = defineProps({
     default: () => [],
   },
   styling: {
-    type: String,
-    default: '',
+    type: Object,
+    default: () => ({}),
   }
 });
 </script>

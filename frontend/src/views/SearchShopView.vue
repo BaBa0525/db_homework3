@@ -26,6 +26,9 @@
   <div class="table-container"
     :style="{ 'margin': '0 auto', 'max-width': `calc(100% - ${sidebar.sidebarWidth} - 4rem)` }">
     <BaseTable :fields="shopsField" :items="shops" @sort-by="handleSorting">
+      <template #cell(distance)="{ item }">
+        {{ Math.round(item.distance) }} m
+      </template>
       <template #cell(action)="{ item }">
         <button type="button" @click="handleTogglePopup(item)">Open Menu</button>
       </template>
@@ -38,15 +41,16 @@
   </ul>
 
   <!-- menu -->
-  <PopupModal :show="popupShop.active" :titles="`Menu of ${popupShop.shopname}`" @close-popup="popupShop.active = false">
+  <PopupModal :show="popupShop.active" :titles="`Menu of ${popupShop.shopname}`"
+    @close-popup="popupShop.active = false">
     <BaseTable :fields="mealsField" :items="meals">
       <template #cell(picture)="{ item }">
         <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
       </template>
       <template #cell(order)="{ item }">
-        <button type="button" :disabled="item.orderQuantity >= item.quantity" @click="editQuantity(item, 1)">+</button>
-        <span>{{ item.orderQuantity }}</span>
         <button type="button" :disabled="item.orderQuantity <= 0" @click="editQuantity(item, -1)">-</button>
+        <span>{{ item.orderQuantity }}</span>
+        <button type="button" :disabled="item.orderQuantity >= item.quantity" @click="editQuantity(item, 1)">+</button>
       </template>
     </BaseTable>
     <BaseDropDown v-model="type" :options="typeOption"></BaseDropDown>
@@ -268,15 +272,19 @@ const deliverFee = computed(() => {
 });
 
 const handleOrder = async () => {
-  await axios.post('/addorder', {
-    account: userStore.account,
-    shopname: popupShop.shopname,
-    meals: orderMeals,
-    type: type,
-    subtotal: subtotal,
-    deliverFee: deliverFee,
-  });
-  alert("Order Successfully");
+  try {
+    await axios.post('/addorder', {
+      account: userStore.account,
+      shopname: popupShop.shopname,
+      meals: orderMeals.value,
+      type: type.value,
+      subtotal: subtotal.value,
+      deliverFee: deliverFee.value,
+    });
+    alert("Order Successfully");
+  } catch (error) {
+    console.log(error);
+  }
   popupOrder.active = false;
 };
 

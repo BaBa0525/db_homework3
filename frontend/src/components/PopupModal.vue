@@ -5,8 +5,8 @@
   <transition name="slide" appear>
     <div class="modal" v-if="show">
       <IconExitPopup class="icon" @click="$emit('close-popup')"></IconExitPopup>
-      <h1>{{titles}}</h1>
-      <hr/>
+      <h1>{{ titles }}</h1>
+      <hr />
       <slot></slot>
     </div>
   </transition>
@@ -58,14 +58,15 @@ const emits = defineEmits(['close-popup'])
   overflow-y: auto;
   scrollbar-gutter: stable;
 
-  h1{
+  h1 {
     align-self: flex-start;
     transform: translateY(-50%);
   }
 
-  hr{
+  hr {
     width: 100%;
     border: 2px solid gray;
+    background-color: gray;
     transform: translateY(-2rem);
   }
 

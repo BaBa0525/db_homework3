@@ -22,4 +22,4 @@ class OrderDetailSchema(ma.Schema):
 
 class TransactionSchema(ma.Schema):
     class Meta:
-        fields = ('RID', 'account', 'trader', 'action', 'time', 'amount')
+        fields = ('RID', 'account', 'trader', 'traderRole', 'action', 'time', 'amount')
