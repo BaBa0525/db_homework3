@@ -18,7 +18,7 @@ class OrderSchema(ma.Schema):
 
 class OrderDetailSchema(ma.Schema):
     class Meta:
-        fields = ('OID', 'shopname', 'mealname', 'price', 'quantity')
+        fields = ('ID', 'OID', 'shopname', 'mealname', 'price', 'quantity')
 
 class TransactionSchema(ma.Schema):
     class Meta:
