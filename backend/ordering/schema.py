@@ -12,3 +12,6 @@ class MealSchema(ma.Schema):
     class Meta:
         fields = ('name', 'shopname', 'image', 'price', 'quantity')
 
+class OrderSchema(ma.Schema):
+    class Meta:
+        fields = ('OID', 'buyer', 'meal', 'shopname', 'price', 'quantity', 'status', 'starttime', 'endtime', 'taking')
