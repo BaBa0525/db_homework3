@@ -1,12 +1,10 @@
 <template>
-    <!-- <router-link to="search"> Search </router-link>
-    <router-link to="shop"> Shop </router-link>
-    <button @click="userStore.logout"> Logout </button> -->
+  <div class="container">
     <SideBar></SideBar>
     <div class="view" :style="{ 'margin-left': `calc(${sidebarStore.sidebarWidth} + 2rem)`}">
         <router-view></router-view>
     </div>
-
+  </div>
 </template>
 
 <script setup>
@@ -24,6 +22,5 @@ const sidebarStore = useSidebarStore()
 .view{
     @include flex;
     justify-content: flex-start;
-
 }
 </style>

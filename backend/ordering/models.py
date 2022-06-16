@@ -54,25 +54,57 @@ class Meal(db.Model):
 
 class Order(db.Model):
     __tablename__ = 'order'
-    ID = db.Column(db.Integer, primary_key=True)
-    buyer = db.Column(db.String(255), db.ForeignKey('users.account'),nullable=False) # account
-    shopname = db.Column(db.String(255), db.ForeignKey('shops.shopname'),nullable=False)
-    meal = db.Column(db.String(255), nullable=False)
+    OID = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String(255), nullable=False)
+    startTime = db.Column(db.DateTime, nullable=False)
+    endTime = db.Column(db.DateTime, nullable=True)
+    shopname = db.Column(db.String(255), nullable=False)
+    subtotal = db.Column(db.Integer, nullable=False)
+    deliverFee = db.Column(db.Integer, nullable=False)
+    customer = db.Column(db.String(255), nullable=False)
+    method = db.Column(db.String(255), nullable=False)
+
+    def __init__(self, status, startTime, shopname, subtotal, deliverFee, customer, method):
+        self.status = status
+        self.startTime = startTime
+        self.shopname = shopname
+        self.subtotal = subtotal
+        self.deliverFee = deliverFee
+        self.customer = customer
+        self.method =  method
+
+
+class OrderDetail(db.Model):
+    __tablename__ = 'order_detail'
+    OID = db.Column(db.Integer, db.ForeignKey('order.OID'), primary_key=True)
+    shopname = db.Column(db.String(255), db.ForeignKey('meals.shopname'), primary_key=True)
+    mealname = db.Column(db.String(255), db.ForeignKey('meals.name'), primary_key=True)
     price = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String(255), nullable=False)
-    starttime = db.Column(db.String(255), nullable=False)
-    endtime = db.Column(db.String(255), nullable=False)
-    taking = db.Column(db.String(255), nullable=False)
-    def __init__(self, buyer, meal, shopname, price, quantity, status, starttime, endtime, taking):
-        self.buyer = buyer
-        self.meal = meal
+    # order = db.relationship('Order')
+    # meal = db.relationship('Meal')
+
+
+    def __init__(self, OID, shopname, mealname, price, quantity):
+        self.OID = OID
         self.shopname = shopname
+        self.mealname = mealname
         self.price = price
         self.quantity = quantity
-        self.status = status
-        self.starttime = starttime
-        self.endtime = endtime
-        self.taking = taking
 
-    
+
+class Transaction(db.Model):
+    __tablename__ = 'transaction'
+    RID = db.Column(db.Integer, primary_key=True)
+    account = db.Column(db.String(255), nullable=False)
+    trader = db.Column(db.String(255), nullable=False)
+    action = db.Column(db.String(255), nullable=False)
+    time = db.Column(db.DateTime, nullable=False)
+    amount = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, account, trader, action, time, amount):
+        self.account = account
+        self.trader = trader
+        self.action = action
+        self.time = time
+        self.amount = amount

@@ -132,7 +132,7 @@ def shopRegister():
     if Shop.query.get(shopname) is None:
         shopData = Shop(shopname, category, latitude, longitude)
         db.session.add(shopData)
-        User.query.filter(User.account == account).update({'role': 'owner', 'shopname': shopname})
+        User.query.filter_by(account=account).update({'role': 'owner', 'shopname': shopname})
         db.session.commit()
         return shopSchema.jsonify(shopData)
     else:

@@ -77,9 +77,6 @@ const handleClick = (field) => {
 @import "@/styles/global.scss";
 
 table {
-  margin-top: 20px;
-  margin-left: auto;
-  margin-right: auto;
   border-radius: 4px;
   width: 75%;
   border-collapse: collapse;

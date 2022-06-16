@@ -1,6 +1,7 @@
 <template>
   <div class="input">
-    <input v-bind="$attrs" type="file" :class="{ 'filled': !isEmpty, 'danger': hasError }" @change="fileChange" />
+    <input v-bind="$attrs" type="file" :class="{ 'filled': isFilled, 'danger': hasError }" ref="fileInput"
+      @input="onFileSelect" />
     <label class="placeholder">
       <span>{{ placeholder }}</span>
     </label>
@@ -13,27 +14,39 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, toRefs, watch, computed } from 'vue';
 
-const isEmpty = ref(true);
-const fileChange = (event) => {
-  isEmpty.value = event.target.files.length === 0;
+const props = defineProps(['placeholder', 'hasError', 'errors', 'fileModel']);
+const emit = defineEmits(['fileChange']);
+
+const { fileModel } = toRefs(props);
+const fileInput = ref(null);
+
+const isFilled = computed(() => (!!fileModel.value));
+
+const onFileSelect = () => {
+  const input = fileInput.value;
+  const files = input.files;
+
+  if (files && files[0]) {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      emit('fileChange', reader.result);
+    };
+
+    reader.readAsDataURL(files[0]);
+  }
+  else {
+    emit('fileChange', null);
+  }
 }
 
-const props = defineProps({
-  placeholder: {
-    type: String,
-    default: "",
-  },
-  hasError: {
-    type: Boolean,
-    default: false,
-  },
-  errors: {
-    type: Array,
-    default: () => [],
-  },
-});
+watch(fileModel, (value) => {
+  if (value === null) {
+    fileInput.value.value = '';
+  }
+})
 </script>
 
 <style scoped lang="scss">

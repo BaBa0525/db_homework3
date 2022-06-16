@@ -14,4 +14,12 @@ class MealSchema(ma.Schema):
 
 class OrderSchema(ma.Schema):
     class Meta:
-        fields = ('OID', 'buyer', 'meal', 'shopname', 'price', 'quantity', 'status', 'starttime', 'endtime', 'taking')
+        fields = ('OID', 'status', 'startTime', 'endTime', 'shopname', 'subtotal', 'distance', 'customer', 'type')
+
+class OrderDetailSchema(ma.Schema):
+    class Meta:
+        fields = ('OID', 'shopname', 'mealname', 'price', 'quantity')
+
+class TransactionSchema(ma.Schema):
+    class Meta:
+        fields = ('RID', 'account', 'trader', 'action', 'time', 'amount')
