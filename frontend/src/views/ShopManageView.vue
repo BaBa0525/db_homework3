@@ -1,59 +1,61 @@
 <template>
-  <BaseRowForm @submit.prevent="handleRegister" buttonText="Register"
-    :disableButton="userStore.isOwner || shopv$.$error || shopv$.$errors.length > 0">
-    <BaseInput :disabled="userStore.isOwner" v-model="shopState.shopname" placeholder="Shop Name"
-      :hasError="shopv$.shopname.$error" :errors="shopv$.shopname.$errors" id="shopname" type="text"
-      @blur="shopv$.shopname.$touch" />
-    <BaseInput :disabled="userStore.isOwner" v-model="shopState.category" placeholder="Category"
-      :hasError="shopv$.category.$error" :errors="shopv$.category.$errors" id="category" type="text"
-      @blur="shopv$.category.$touch" />
-    <BaseInput :disabled="userStore.isOwner" v-model="shopState.latitude" placeholder="Latitude"
-      :hasError="shopv$.latitude.$error" :errors="shopv$.latitude.$errors" id="latitude" type="text"
-      @blur="shopv$.latitude.$touch" />
-    <BaseInput :disabled="userStore.isOwner" v-model="shopState.longitude" placeholder="Longitude"
-      :hasError="shopv$.longitude.$error" :errors="shopv$.longitude.$errors" id="longitude" type="text"
-      @blur="shopv$.longitude.$touch" />
-  </BaseRowForm>
+  <div class="container">
+    <BaseRowForm @submit.prevent="handleRegister" buttonText="Register"
+      :disableButton="userStore.isOwner || shopv$.$error || shopv$.$errors.length > 0">
+      <BaseInput :disabled="userStore.isOwner" v-model="shopState.shopname" placeholder="Shop Name"
+        :hasError="shopv$.shopname.$error" :errors="shopv$.shopname.$errors" id="shopname" type="text"
+        @blur="shopv$.shopname.$touch" />
+      <BaseInput :disabled="userStore.isOwner" v-model="shopState.category" placeholder="Category"
+        :hasError="shopv$.category.$error" :errors="shopv$.category.$errors" id="category" type="text"
+        @blur="shopv$.category.$touch" />
+      <BaseInput :disabled="userStore.isOwner" v-model="shopState.latitude" placeholder="Latitude"
+        :hasError="shopv$.latitude.$error" :errors="shopv$.latitude.$errors" id="latitude" type="text"
+        @blur="shopv$.latitude.$touch" />
+      <BaseInput :disabled="userStore.isOwner" v-model="shopState.longitude" placeholder="Longitude"
+        :hasError="shopv$.longitude.$error" :errors="shopv$.longitude.$errors" id="longitude" type="text"
+        @blur="shopv$.longitude.$touch" />
+    </BaseRowForm>
 
-  <BaseRowForm @submit.prevent="handleAddMeal" buttonText="Add"
-    :disableButton="!userStore.isOwner || mealv$.$error || mealv$.$errors.length > 0">
-    <BaseInput :disabled="!userStore.isOwner" v-model="mealState.mealname" placeholder="Meal Name"
-      :hasError="mealv$.mealname.$error" :errors="mealv$.mealname.$errors" id="mealname" type="text"
-      @blur="mealv$.mealname.$touch" />
-    <BaseInput :disabled="!userStore.isOwner" v-model="mealState.price" placeholder="Price"
-      :hasError="mealv$.price.$error" :errors="mealv$.price.$errors" id="price" type="text"
-      @blur="mealv$.price.$touch" />
-    <BaseInput :disabled="!userStore.isOwner" v-model="mealState.quantity" placeholder="Quantity"
-      :hasError="mealv$.quantity.$error" :errors="mealv$.quantity.$errors" id="quantity" type="text"
-      @blur="mealv$.quantity.$touch" />
-    <FileInput :disabled="!userStore.isOwner" :hasError="mealv$.image.$error" :errors="mealv$.image.$errors" id="image"
-      accept="image/*" @change="handleImageChange" />
-  </BaseRowForm>
+    <BaseRowForm @submit.prevent="handleAddMeal" buttonText="Add"
+      :disableButton="!userStore.isOwner || mealv$.$error || mealv$.$errors.length > 0">
+      <BaseInput :disabled="!userStore.isOwner" v-model="mealState.mealname" placeholder="Meal Name"
+        :hasError="mealv$.mealname.$error" :errors="mealv$.mealname.$errors" id="mealname" type="text"
+        @blur="mealv$.mealname.$touch" />
+      <BaseInput :disabled="!userStore.isOwner" v-model="mealState.price" placeholder="Price"
+        :hasError="mealv$.price.$error" :errors="mealv$.price.$errors" id="price" type="text"
+        @blur="mealv$.price.$touch" />
+      <BaseInput :disabled="!userStore.isOwner" v-model="mealState.quantity" placeholder="Quantity"
+        :hasError="mealv$.quantity.$error" :errors="mealv$.quantity.$errors" id="quantity" type="text"
+        @blur="mealv$.quantity.$touch" />
+      <FileInput :disabled="!userStore.isOwner" :hasError="mealv$.image.$error" :errors="mealv$.image.$errors"
+        id="image" accept="image/*" :fileModel="mealState.image" @fileChange="handleFileChange" />
+    </BaseRowForm>
 
-  <BaseTable :fields="fields" :items="meals">
-    <template #cell(photo)="{ item }">
-      <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
-    </template>
-    <template #cell(price)="{ item }">
-      <BaseInput :disabled="!item.isEditing" v-model="item.price" :hasError="item.v$.price.$error"
-        :errors="item.v$.price.$errors" type="text" @blur="item.v$.price.$touch"
-        style="text-align: center; cursor: default;" />
-    </template>
-    <template #cell(quantity)="{ item }">
-      <BaseInput :disabled="!item.isEditing" v-model="item.quantity" :hasError="item.v$.quantity.$error"
-        :errors="item.v$.quantity.$errors" type="text" @blur="item.v$.quantity.$touch"
-        style="text-align: center; cursor: default;" />
-    </template>
-    <template #cell(edit)="{ item }">
-      <button type="button" :disabled="item.v$.$error || item.v$.$errors.length > 0" @click="handleEdit(item)">
-        <span v-if="item.isEditing">Finish</span>
-        <span v-else>Edit</span>
-      </button>
-    </template>
-    <template #cell(delete)="{ item }">
-      <button type="button" @click="handleDelete(item)">Delete</button>
-    </template>
-  </BaseTable>
+    <BaseTable :fields="fields" :items="meals">
+      <template #cell(photo)="{ item }">
+        <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
+      </template>
+      <template #cell(price)="{ item }">
+        <BaseInput :disabled="!item.isEditing" v-model="item.price" :hasError="item.v$.price.$error"
+          :errors="item.v$.price.$errors" type="text" @blur="item.v$.price.$touch"
+          style="text-align: center; cursor: default;" />
+      </template>
+      <template #cell(quantity)="{ item }">
+        <BaseInput :disabled="!item.isEditing" v-model="item.quantity" :hasError="item.v$.quantity.$error"
+          :errors="item.v$.quantity.$errors" type="text" @blur="item.v$.quantity.$touch"
+          style="text-align: center; cursor: default;" />
+      </template>
+      <template #cell(edit)="{ item }">
+        <button type="button" :disabled="item.v$.$error || item.v$.$errors.length > 0" @click="handleEdit(item)">
+          <span v-if="item.isEditing">Finish</span>
+          <span v-else>Edit</span>
+        </button>
+      </template>
+      <template #cell(delete)="{ item }">
+        <button type="button" @click="handleDelete(item)">Delete</button>
+      </template>
+    </BaseTable>
+  </div>
 </template>
 
 <script setup>
@@ -65,8 +67,7 @@ import BaseImage from '../components/BaseImage.vue';
 import { useUserStore } from '../stores/user';
 
 import axios from 'axios';
-import { useRouter } from 'vue-router';
-import { reactive, computed } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, decimal, between, helpers, minValue } from '@vuelidate/validators';
 
@@ -116,7 +117,6 @@ const loadShopMeals = async () => {
   } catch (error) {
     console.log(error);
   }
-  console.log(meals);
 }
 
 const startup = async () => {
@@ -144,7 +144,6 @@ const shopRules = computed(() => ({
 }));
 
 const shopv$ = useVuelidate(shopRules, shopState);
-const router = useRouter();
 
 const handleRegister = async () => {
   shopv$.value.$touch();
@@ -157,7 +156,7 @@ const handleRegister = async () => {
       account: userStore.account,
     });
     alert('Registration succeed!');
-    userStore.reload();
+    await userStore.reload();
     await loadUserShop();
   } catch (error) {
     console.log(error);
@@ -169,7 +168,7 @@ const mealState = reactive({
   price: '',
   quantity: '',
   shopname: '',
-  image: '',
+  image: null,
 });
 
 const mealRules = computed(() => ({
@@ -181,17 +180,8 @@ const mealRules = computed(() => ({
 
 const mealv$ = useVuelidate(mealRules, mealState);
 
-const handleImageChange = (event) => {
-  const file = event.target.files[0];
-
-  try {
-    const reader = new FileReader();
-    reader.onloadend = () => { mealState.image = reader.result };
-    reader.readAsDataURL(file);
-  } catch {
-    mealState.image = '';
-  }
-
+const handleFileChange = (file) => {
+  mealState.image = file;
   mealv$.value.image.$touch();
 }
 
@@ -205,8 +195,14 @@ const handleAddMeal = async () => {
     });
     await loadShopMeals();
   } catch (error) {
-    console.log(error);
+    alert('Something went wrong, please check your meal details again.');
   }
+  mealState.mealname = '';
+  mealState.price = '';
+  mealState.quantity = '';
+  mealState.shopname = '';
+  mealState.image = null;
+  mealv$.value.$reset();
 }
 
 const fields = [
@@ -252,19 +248,25 @@ const handleDelete = async (item) => {
 <style scoped lang="scss">
 @import "@/styles/global.scss";
 
-button {
-  border: none;
-  border-radius: 4px;
-  padding: 10px 12px;
-  background-color: var(--info-color);
-  color: var(--white-color);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100px;
+.container {
+  @include flex;
+  align-items: flex-start;
+  gap: 3rem;
 
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+  button {
+    border: none;
+    border-radius: 4px;
+    padding: 10px 12px;
+    background-color: var(--info-color);
+    color: var(--white-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100px;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
   }
 }
 </style>
