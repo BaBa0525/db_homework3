@@ -10,7 +10,6 @@
     "@vuelidate/core": "^2.0.0-alpha.41",
     "@vuelidate/validators": "^2.0.0-alpha.29",
     "axios": "^0.27.2",
-    "haversine": "^1.1.1",
     "pinia": "^2.0.14",
     "pinia-plugin-persistedstate": "^1.6.1",
     "sass": "^1.52.1",
@@ -19,6 +18,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",
+    "haversine": "^1.1.1",
     "vite": "^2.9.9"
   }
 }
