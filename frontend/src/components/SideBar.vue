@@ -1,22 +1,21 @@
 <template>
-  <div class="sidebar" :style="{width: sidebarStore.sidebarWidth}">
+  <div class="sidebar" :style="{ width: sidebarStore.sidebarWidth }">
     <h1>
       <span v-if="sidebarStore.collapsed">
         <div>F</div>
         <div>E</div>
       </span>
-      <span v-else>Fooder <br/>Eats</span>
+      <span v-else>Foober<br />Eats</span>
     </h1>
+    <SideBarLink to="/profile" :icon="IconProfile">profile</SideBarLink>
     <SideBarLink to="/search" :icon="IconSearch">Search</SideBarLink>
     <SideBarLink to="/shop" :icon="IconShop">Shop</SideBarLink>
     <SideBarLink to="/myorder" :icon="IconMyorder">My Order</SideBarLink>
     <SideBarLink to="/shoporder" :icon="IconShoporder">Shop Order</SideBarLink>
     <SideBarLink to="/transaction" :icon="Transaction">Transaction Record</SideBarLink>
     <SideBarLink to="/signin" :icon="IconLogout" @click="userStore.logout">Logout</SideBarLink>
-    <SideBarLink to="/profile" :icon="IconLogout">profile</SideBarLink>
-    
-    <IconToggle class="toggle" :class="{ 'rotate-180' : !sidebarStore.collapsed}" @click="sidebarStore.toggle"/>
 
+    <IconToggle class="toggle" :class="{ 'rotate-180': !sidebarStore.collapsed }" @click="sidebarStore.toggle" />
   </div>
 
 </template>
@@ -32,6 +31,7 @@ import IconShoporder from "./icons/IconShoporder.vue"
 import Transaction from "./icons/IconTransaction.vue"
 import SideBarLink from "./SideBarLink.vue";
 import IconLogout from "./icons/IconLogout.vue"
+import IconProfile from "./icons/IconProfile.vue";
 
 const userStore = useUserStore();
 const sidebarStore = useSidebarStore()
@@ -54,7 +54,12 @@ const sidebarStore = useSidebarStore()
   display: flex;
   flex-direction: column;
 
-  .toggle{
+  h1 {
+    margin-left: 0.5rem;
+    cursor: default;
+  }
+
+  .toggle {
     position: absolute;
     bottom: 0;
     padding: 0.75em;
@@ -65,11 +70,9 @@ const sidebarStore = useSidebarStore()
 
     &.rotate-180 {
       transform: rotate(180deg);
-      transition: 1s linear;
+      transition: 0.2s linear;
     }
   }
 
 }
-
-
 </style>
