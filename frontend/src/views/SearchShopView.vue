@@ -271,14 +271,6 @@ const deliverFee = computed(() => {
 
 const handleOrder = async () => {
   try {
-    console.log({
-      account: userStore.account,
-      shopname: popupShop.shopname,
-      meals: orderMeals.value,
-      type: type.value,
-      subtotal: subtotal.value,
-      deliverFee: deliverFee.value,
-    })
     await axios.post('/addorder', {
       account: userStore.account,
       shopname: popupShop.shopname,
@@ -289,8 +281,9 @@ const handleOrder = async () => {
     });
     alert("Order Successfully");
   } catch (error) {
-    console.log(error);
+    alert(error.response.data.message);
   }
+
   popupOrder.active = false;
 };
 
