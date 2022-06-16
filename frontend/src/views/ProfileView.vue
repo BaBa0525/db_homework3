@@ -10,7 +10,7 @@
     <li>wallet balance: ${{userStore.balance}}</li>
     <button @click="active.balance = true">Recharge</button>
 </ul>
-    <PopupModal :show="active.location" @close-popup="closePopup">
+    <PopupModal :show="active.location" titles="Update location" @close-popup="closePopup">
     <ul>
         <li>Current latitude: {{userStore.latitude}}</li>
         <li>Current longitude: {{userStore.longitude}}</li>
@@ -23,7 +23,7 @@
         <button @click="handleLocation">Update</button>
     </PopupModal>
 
-    <PopupModal :show="active.balance" @close-popup="closePopup">
+    <PopupModal :show="active.balance" titles="Recharge" @close-popup="closePopup">
         <h1>Current balence: {{userStore.balance}}</h1>
         <BaseInput v-model="balance_state.addValue" placeholder="enter add value" :hasError="v_balance$.addValue.$error"
       :errors="v_balance$.addValue.$errors" id="addValue" type="text" @blur="v_balance$.addValue.$touch" />
@@ -109,11 +109,11 @@ const handleLocation = async () => {
     });
     
     await userStore.reload();
-    alert('Recharge succeed!');
+    alert('Update succeed!');
 
   } catch (error) {
     console.log(error);
-    alert('Recharge fail!');
+    alert('Update fail!');
   }
   closePopup();
 }
