@@ -85,3 +85,17 @@ def updateLocationOfUser():
 
     db.session.commit()
     return userSchema.jsonify(userData)
+
+
+@app.route('/recharge', methods=['PUT'])
+def recharge():
+    account = request.json['account']
+    value = request.json['value']
+
+    if (userData := User.query.filter_by(account=account)) is None:
+        return ERROR_USER_NOT_EXISTS
+
+    userData.update({ 'balance': userData.balance + value })
+    
+    db.session.commit()
+    return userSchema.jsonify(userData)
