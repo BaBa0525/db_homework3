@@ -1,18 +1,25 @@
 <template>
-    <BaseDropDown v-model="state.status" id='status' :options='options' />
+    <BaseDropDown v-model="state.status" id="status" :options="options" @change="loadOrders" />
 
-    <BaseTable :fields="orderfields" :item="orders">
+    <BaseTable :fields="orderfields" :items="orders">
+        <template #cell(picture)="{ item }">
+            <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
+        </template>
         <template #cell(detail)="{ item }">
             <button type="button" @click="showDetail(item)">Order Details</button>
         </template>
         <template #cell(action)="{ item }">
-            <button type="button" :show="item.status === 'Not finished'" @click="cancelOrder(item)">Cancel</button>
+            <button type="button" v-if="item.status === 'Not finished'" @click="cancelOrder(item)">Cancel</button>
         </template>
     </BaseTable>
 
-    <PopupModal :show="popupDetail.active" @close-popup="popupDetail.active = false">
-        <h1>Order</h1>
-        <BaseTable :fields="popupFields" :items="getOrderDetail()"></BaseTable>
+    <PopupModal :show="popupDetail.active" titles="Order" @close-popup="popupDetail.active = false">
+
+        <BaseTable :fields="popupFields" :items="popupDetail.orderDetail">
+            <template #cell(picture)="{ item }">
+                <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
+            </template>
+        </BaseTable>
         <div class="totalprice">
             <p>Subtotal ${{ subtotal }}</p>
             <p>Delivery Fee ${{ deliverFee }}</p>
@@ -29,6 +36,7 @@ import axios from 'axios';
 import BaseDropDown from '../components/BaseDropDown.vue';
 import BaseTable from '../components/BaseTable.vue';
 import PopupModal from "../components/PopupModal.vue";
+import BaseImage from '../components/BaseImage.vue';
 
 const state = reactive({
     status: 'All',
@@ -52,13 +60,15 @@ const userStore = useUserStore();
 
 const popupDetail = reactive({
     active: false,
-    order: [],
+    order: null,
     orderDetail: [],
 });
 
-const showDetail = (item) => {
+const showDetail = async (item) => {
     popupDetail.active = true;
     popupDetail.order = item;
+    console.log(popupDetail.order);
+    await getOrderDetail();
 }
 
 const cancelOrder = async (item) => {
@@ -78,6 +88,8 @@ const loadOrders = async () => {
     }
 }
 
+loadOrders();
+
 const popupFields = [
     { key: 'picture', sortable: false },
     { key: 'mealname', sortable: false },
@@ -85,11 +97,17 @@ const popupFields = [
     { key: 'quantity', sortable: false },
 ];
 
-const getOrderDetail = async (item) => {
+const getOrderDetail = async () => {
     try {
-        const response = await axios.get(`/getorderdetail/${item.OID}`);
-        popupDetail.orderDetail = response.data;
-        return response.data;
+        const response = await axios.get(`/getorderdetail/${popupDetail.order.OID}`);
+        const responseDetail = response.data;
+        popupDetail.orderDetail.splice(0, popupDetail.orderDetail.length);
+        for (const detail of responseDetail) {
+            popupDetail.orderDetail.push({
+                ...detail.detail,
+                image: detail.image,
+            })
+        }
     }
     catch (error) {
         console.log(error);
@@ -106,5 +124,22 @@ const deliverFee = computed(() => {
 
 </script>
 
-<style>
+<style scoped lang="scss">
+@import "@/styles/global.scss";
+
+button {
+    border: none;
+    border-radius: 4px;
+    padding: 10px 12px;
+    background-color: var(--info-color);
+    color: var(--white-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100px;
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
 </style>
