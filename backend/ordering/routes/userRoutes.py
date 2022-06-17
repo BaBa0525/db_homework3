@@ -107,7 +107,6 @@ def recharge():
 def getTransaction():
     account = request.json['account']
     action = request.json['action']
-    print(action, account)
 
     if action == 'All':
         transaction = Transaction.query.filter(db.or_(Transaction.account==account, Transaction.trader==account))
