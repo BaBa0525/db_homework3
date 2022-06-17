@@ -11,6 +11,8 @@
 </template>
 
 <script setup>
+import { toRefs, watch } from 'vue';
+
 const props = defineProps({
   modelValue: {
     type: String,
@@ -24,6 +26,14 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+});
+
+const emit = defineEmits(['update:modelValue', 'choose']);
+
+const { modelValue } = toRefs(props);
+
+watch(modelValue, () => {
+  emit('choose');
 });
 </script>
 

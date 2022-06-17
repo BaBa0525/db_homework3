@@ -1,6 +1,6 @@
 <template>
   <div v-if="userStore.isOwner">
-    <BaseDropDown v-model="state.status" id="status" :options="options" @change="loadOrders" />
+    <BaseDropDown v-model="state.status" id="status" :options="options" @choose="loadOrders" />
 
     <BaseTable :fields="orderfields" :items="orders">
       <template #cell(detail)="{ item }">
@@ -45,7 +45,7 @@ const state = reactive({
   status: 'All',
 })
 
-const options = ['All', 'Finished', 'Not Finished', 'cancel'];
+const options = ['All', 'Finished', 'Not finished', 'cancel'];
 const orderfields = [
   { key: 'OID', sortable: false },
   { key: 'status', sortable: false },
@@ -82,19 +82,23 @@ const cancelOrder = async (item) => {
   } catch (error) {
     console.log(error);
   }
-  await loadOrders();
+  await loadOrders()
 }
 
 const loadOrders = async () => {
   try {
-    const response = await axios.get(`/getshoporder/${userStore.shopname}`);
+    const response = await axios.post('/getshoporder', {
+      shopname: userStore.shopname,
+      status: state.status,
+    });
+
     orders.value = response.data;
   }
   catch (error) {
     console.log(error);
   }
-  console.log(orders.value);
-}
+};
+
 loadOrders();
 
 const popupFields = [
@@ -129,6 +133,20 @@ const subtotal = computed(() => {
 const deliverFee = computed(() => {
   return popupDetail.order.deliverFee;
 })
+
+const finishOrder = async (item) => {
+  try {
+    await axios.post('/finishorder', {
+      orderID: item.OID,
+    })
+    alert('Finish Order Successfully!');
+  }
+  catch {
+    console.log(error);
+  }
+
+  await loadOrders();
+}
 
 </script>
 

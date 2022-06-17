@@ -80,16 +80,18 @@ class OrderDetail(db.Model):
     OID = db.Column(db.Integer, db.ForeignKey('order.OID'), primary_key=True)
     shopname = db.Column(db.String(255), db.ForeignKey('meals.shopname'), primary_key=True)
     mealname = db.Column(db.String(255), db.ForeignKey('meals.name'), primary_key=True)
+    picture = db.Column(db.TEXT, nullable=False)
     price = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     # order = db.relationship('Order')
     # meal = db.relationship('Meal')
 
 
-    def __init__(self, OID, shopname, mealname, price, quantity):
+    def __init__(self, OID, shopname, mealname, picture, price, quantity):
         self.OID = OID
         self.shopname = shopname
         self.mealname = mealname
+        self.picture = picture
         self.price = price
         self.quantity = quantity
 
