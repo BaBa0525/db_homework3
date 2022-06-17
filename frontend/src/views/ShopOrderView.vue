@@ -4,6 +4,9 @@
       <BaseDropDown v-model="state.status" id="status" :options="options" @choose="loadOrders" />
 
       <BaseTable :fields="orderfields" :items="orders">
+        <template #cell(select)="{ item }">
+            <input type="checkbox" v-if="item.status === 'Not finished'" v-model="item.checked" />
+        </template>
         <template #cell(total_price)="{ item }">
           ${{ item.subtotal + item.deliverFee }}
         </template>
@@ -11,10 +14,16 @@
           <button type="button" @click="showDetail(item)">Order Details</button>
         </template>
         <template #cell(action)="{ item }">
-          <button type="button" v-if="item.status === 'Not finished'" @click="finishOrder(item)">Finish</button>
-          <button type="button" v-if="item.status === 'Not finished'" @click="cancelOrder(item)">Cancel</button>
+          <div class="button-flex">
+            <button type="button" v-if="item.status === 'Not finished'" @click="finishOrder(item)">Finish</button>
+            <button type="button" v-if="item.status === 'Not finished'" @click="cancelOrder(item)">Cancel</button>
+          </div>
         </template>
       </BaseTable>
+      <div class="button-flex">
+        <button type="button" v-if="haschecked" @click="finishOrder()">finish</button>
+        <button type="button" v-if="haschecked" @click="cancelOrder()">cancel</button>
+      </div>
     </div>
     <PopupModal :show="popupDetail.active" titles="Order" @close-popup="popupDetail.active = false">
       <BaseTable :fields="popupFields" :items="popupDetail.orderDetail">
@@ -51,6 +60,7 @@ const state = reactive({
 
 const options = ['All', 'Finished', 'Not finished', 'Cancelled'];
 const orderfields = [
+  { key: 'select', sortable: false},
   { key: 'OID', sortable: false },
   { key: 'status', sortable: false },
   { key: 'startTime', sortable: false },
@@ -78,15 +88,19 @@ const showDetail = async (item) => {
   console.log(popupDetail.orderDetail);
 }
 
-const cancelOrder = async (item) => {
-  try {
+const haschecked = computed(() => (orders.value.filter((food) => (food.checked)).length > 0))
+
+const cancelOrder = async (item = null) => {   
+  try{
+    const checkedorder = orders.value.filter((food) => (food.checked)).map((order) => (order.OID));
     await axios.post('/cancelorder', {
-      orderIDs: [item.OID],
+      orderIDs: (item === null) ? checkedorder : [item.OID],
     });
-  } catch (error) {
-    console.log(error);
+    await loadOrders();
+    alert("cancel successfully")
+  } catch(error){
+    alert(error.response.data.message);
   }
-  await loadOrders()
 }
 
 const loadOrders = async () => {
@@ -97,6 +111,9 @@ const loadOrders = async () => {
     });
 
     orders.value = response.data;
+    for(const order of orders.value){
+      order.checked = false;
+    }
   }
   catch (error) {
     console.log(error);
@@ -132,15 +149,16 @@ const deliverFee = computed(() => {
   return popupDetail.order.deliverFee;
 })
 
-const finishOrder = async (item) => {
+const finishOrder = async (item = null) => {
   try {
+    const checkedorder = orders.value.filter((food) => (food.checked)).map((order) => (order.OID));
     await axios.post('/finishorder', {
-      orderIDs: [item.OID],
+    orderIDs: (item === null) ? checkedorder : [item.OID],
     })
     alert('Finish Order Successfully!');
   }
   catch {
-    console.log(error);
+    alert(error.response.data.message);
   }
 
   await loadOrders();
@@ -180,5 +198,10 @@ button {
 .base-container {
   @include flex;
   align-items: flex-start;
+}
+
+.button-flex {
+  @include flex-row;
+  gap: 0.1rem;
 }
 </style>
