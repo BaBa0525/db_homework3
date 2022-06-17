@@ -46,7 +46,7 @@ const state = reactive({
   status: 'All',
 })
 
-const options = ['All', 'Finished', 'Not finished', 'cancel'];
+const options = ['All', 'Finished', 'Not finished', 'Cancelled'];
 const orderfields = [
   { key: 'OID', sortable: false },
   { key: 'status', sortable: false },
@@ -78,7 +78,7 @@ const showDetail = async (item) => {
 const cancelOrder = async (item) => {
   try {
     await axios.post('/cancelorder', {
-      orderID: item.OID,
+      orderIDs: [item.OID],
     });
   } catch (error) {
     console.log(error);
@@ -113,14 +113,8 @@ const popupFields = [
 const getOrderDetail = async () => {
   try {
     const response = await axios.get(`/getorderdetail/${popupDetail.order.OID}`);
-    const responseDetail = response.data;
-    popupDetail.orderDetail.splice(0, popupDetail.orderDetail.length);
-    for (const detail of responseDetail) {
-      popupDetail.orderDetail.push({
-        ...detail.detail,
-        image: detail.image,
-      })
-    }
+    popupDetail.orderDetail = response.data;
+    console.log(popupDetail.orderDetail);
   }
   catch (error) {
     console.log(error);
@@ -138,7 +132,7 @@ const deliverFee = computed(() => {
 const finishOrder = async (item) => {
   try {
     await axios.post('/finishorder', {
-      orderID: item.OID,
+      orderIDs: [item.OID],
     })
     alert('Finish Order Successfully!');
   }

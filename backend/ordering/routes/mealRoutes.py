@@ -1,9 +1,9 @@
 from flask import request
+from datetime import datetime
 
 from ordering import app, db
-from ordering.models import Meal
+from ordering.models import *
 from ordering.schema import MealSchema
-
 
 mealSchema = MealSchema()
 mealListSchema = MealSchema(many=True)
@@ -34,6 +34,29 @@ def getMealByShopname(shopname):
 def deleteMealFromShop():
     shopname = request.json['shopname']
     mealname = request.json['mealname']
+
+    orderDetailList = OrderDetail.query.filter_by(shopname=shopname, mealname=mealname).all()
+    db.session.commit()
+
+    # cancelOrderByIDList([detail.OID for detail in orderDetailList])
+    with db.session.begin():
+        for orderID in [detail.OID for detail in orderDetailList]:
+            orderData = Order.query.filter_by(OID=orderID)
+            orderDetails = OrderDetail.query.filter_by(OID=orderID)
+            transactions = Transaction.query.filter_by(OID=orderID)
+
+            for detail in orderDetails.all():
+                mealQuery = Meal.query.filter_by(shopname=detail.shopname, name=detail.mealname)
+                meal = mealQuery.first()
+                mealQuery.update({ 'quantity': meal.quantity + detail.quantity })
+            
+            for transaction in transactions.all():
+                userQuery = User.query.filter_by(account=transaction.account)
+                user = userQuery.first()
+                userQuery.update({ 'balance': user.balance + (-1 * transaction.amount) })
+
+            orderData.update({ 'status': 'Cancelled', 'endTime': datetime.now()})
+            transactions.delete()
 
     mealData = Meal.query.filter_by(shopname=shopname, name=mealname)
     mealData.delete()
