@@ -140,4 +140,9 @@ button {
     cursor: not-allowed;
   }
 }
+
+.container {
+    @include flex;
+    align-items: flex-start;
+}
 </style>
