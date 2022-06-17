@@ -4,6 +4,9 @@
       <BaseDropDown v-model="state.status" id="status" :options="options" @choose="loadOrders" />
 
       <BaseTable :fields="orderfields" :items="orders">
+        <template #cell(total_price)="{ item }">
+          ${{ item.subtotal + item.deliverFee }}
+        </template>
         <template #cell(detail)="{ item }">
           <button type="button" @click="showDetail(item)">Order Details</button>
         </template>
@@ -53,7 +56,7 @@ const orderfields = [
   { key: 'startTime', sortable: false },
   { key: 'endTime', sortable: false },
   { key: 'shopname', sortable: false },
-  { key: 'subtotal', sortable: false },
+  { key: 'total_price', sortable: false },
   { key: 'detail', sortable: false },
   { key: 'action', sortable: false },
 ];

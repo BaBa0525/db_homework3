@@ -2,8 +2,8 @@
   <BaseDropDown v-model="state.status" id="status" :options="options" @choose="loadOrders" />
 
   <BaseTable :fields="orderfields" :items="orders">
-    <template #cell(picture)="{ item }">
-      <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
+    <template #cell(total_price)="{ item }">
+      $ {{ item.subtotal + item.deliverFee }}
     </template>
     <template #cell(detail)="{ item }">
       <button type="button" @click="showDetail(item)">Order Details</button>
@@ -49,7 +49,7 @@ const orderfields = [
   { key: 'startTime', sortable: false },
   { key: 'endTime', sortable: false },
   { key: 'shopname', sortable: false },
-  { key: 'subtotal', sortable: false },
+  { key: 'total_price', sortable: false },
   { key: 'detail', sortable: false },
   { key: 'action', sortable: false },
 ];
@@ -142,7 +142,7 @@ button {
 }
 
 .container {
-    @include flex;
-    align-items: flex-start;
+  @include flex;
+  align-items: flex-start;
 }
 </style>

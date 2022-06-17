@@ -81,6 +81,7 @@ def createOrder():
     subtotal = request.json['subtotal']
     deliverFee = request.json['deliverFee']
     method = request.json['type']
+    totalCost = subtotal + deliverFee
 
     with db.session.begin():
         userQuery = User.query.filter_by(account=account)
@@ -98,7 +99,6 @@ def createOrder():
             mealName = meal['name']
             mealPrice = meal['price']
             mealQuantity = meal['orderQuantity']
-            mealSubtotal = mealPrice * mealQuantity
             mealPicture = meal['image']
 
             Detail = OrderDetail(orderData.OID, shopname, mealName, mealPicture, mealPrice, mealQuantity)
@@ -113,18 +113,18 @@ def createOrder():
             mealData.update({ 'quantity': modifiedQuantity })
 
 
-            if (modifiedUserBalance := user.balance - mealSubtotal) < 0:
-                db.session.rollback()
-                return ({ 'message': 'Not enough balance.' }, BAD_REQUEST)
+        if (modifiedUserBalance := user.balance - totalCost) < 0:
+            db.session.rollback()
+            return ({ 'message': 'Not enough balance.' }, BAD_REQUEST)
 
-            userQuery.update({ 'balance': modifiedUserBalance })
+        userQuery.update({ 'balance': modifiedUserBalance })
 
-            ownerQuery = User.query.filter_by(shopname=shopname)
-            owner = ownerQuery.first()
-            ownerQuery.update({ 'balance': owner.balance + mealSubtotal })
+        ownerQuery = User.query.filter_by(shopname=shopname)
+        owner = ownerQuery.first()
+        ownerQuery.update({ 'balance': owner.balance + totalCost })
 
-        userTransaction = Transaction(orderData.OID, user.account, shopname, 'shop', 'Payment', time, -1 * (subtotal + deliverFee))
-        ownerTransaction = Transaction(orderData.OID, owner.account, user.account, 'user', 'Receive', time, subtotal + deliverFee)
+        userTransaction = Transaction(orderData.OID, user.account, shopname, 'shop', 'Payment', time, -1 * totalCost)
+        ownerTransaction = Transaction(orderData.OID, owner.account, user.account, 'user', 'Receive', time, totalCost)
         db.session.add_all([userTransaction, ownerTransaction])
     
     return ({ 'message': 'done' }, OK)

@@ -58,7 +58,7 @@
   </PopupModal>
 
   <!-- order -->
-  <PopupModal :show="popupOrder.active" titles="Order" @close-popup="popupOrder.active = false">
+  <PopupModal :show="popupOrder.active" titles="Order Preview" @close-popup="popupOrder.active = false">
     <BaseTable :fields="orderField" :items="orderMeals">
       <template #cell(picture)="{ item }">
         <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
@@ -259,9 +259,7 @@ const subtotal = computed(() => {
 
 const deliverFee = computed(() => {
   const dist = shops.filter((item) => (item.shopname === popupShop.shopname))[0].distance;
-  console.log(type.value);
   if (type.value === 'Pickup') {
-    console.log('pickup');
     return 0;
   }
   else {
