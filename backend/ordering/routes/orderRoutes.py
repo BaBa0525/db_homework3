@@ -29,21 +29,33 @@ def cancelOrder():
             user = userQuery.first()
             userQuery.update({ 'balance': user.balance + (-1 * transaction.amount) })
 
-        orderData.delete()
-        orderDetails.delete()
+        orderData.update({ 'status': 'cancel', 'endTime': datetime.now()})
         transactions.delete()
 
     return orderSchema.jsonify(orderData)
 
-@app.route('/getorder/<account>', methods=['GET'])
-def getOrder(account):
-    orderData = Order.query.filter_by(customer=account)
+@app.route('/getorder', methods=['POST'])
+def getOrder():
+    account = request.json['account']
+    status = request.json['status']
+    
+    if status == 'All' :
+        orderStatus = ['Finished', 'Not finished', 'cancel']
+    else:
+        orderStatus = [status]
+    orderData = Order.query.filter(Order.status.in_(orderStatus),Order.customer==account)
     return orderListSchema.jsonify(orderData)
 
 
-@app.route('/getshoporder/<shopname>', methods=['GET'])
-def getShopOrder(shopname):
-    orderData = Order.query.filter_by(shopname=shopname)
+@app.route('/getshoporder', methods=['POST'])
+def getShopOrder():
+    shopname = request.json['shopname']
+    status = request.json['status']
+    if status == 'All' :
+        orderStatus = ['Finished', 'Not finished', 'cancel']
+    else: 
+        orderStatus = [status]
+    orderData = Order.query.filter(Order.status.in_(orderStatus),Order.shopname==shopname)
     return orderListSchema.jsonify(orderData)
 
 @app.route('/getorderdetail/<OID>', methods=['GET'])
@@ -71,7 +83,6 @@ def createOrder():
         userQuery = User.query.filter_by(account=account)
         user = userQuery.first()
         shop = Shop.query.get(shopname)
-
         time = datetime.now()
 
         # create a order
@@ -86,8 +97,9 @@ def createOrder():
             mealPrice = meal['price']
             mealQuantity = meal['orderQuantity']
             mealSubtotal = mealPrice * mealQuantity
+            mealPicture = meal['image']
 
-            Detail = OrderDetail(orderData.OID, shopname, mealName, mealPrice, mealQuantity)
+            Detail = OrderDetail(orderData.OID, shopname, mealPicture, mealName, mealPrice, mealQuantity)
             print(Detail)
             db.session.add(Detail)
 
@@ -106,7 +118,6 @@ def createOrder():
 
             userQuery.update({ 'balance': modifiedUserBalance })
 
-            print("ya")
             ownerQuery = User.query.filter_by(shopname=shopname)
             owner = ownerQuery.first()
             ownerQuery.update({ 'balance': owner.balance + mealSubtotal })
@@ -118,7 +129,15 @@ def createOrder():
     return ({ 'message': 'done' }, OK)
 
         
+@app.route('/finishorder', methods=['POST'])
+def finishOrder():
+    orderID = request.json['orderID']
 
+    orderQuery = Order.query.filter_by(OID=orderID)
+    orderQuery.update({ 'status': 'Finished', 'endTime': datetime.now()})
+    
+    db.session.commit()
+    return orderSchema.jsonify(orderQuery)
 
 
 
