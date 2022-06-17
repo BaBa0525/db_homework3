@@ -1,5 +1,5 @@
 <template>
-    <BaseDropDown v-model="state.status" id="status" :options="options" @change="loadOrders" />
+    <BaseDropDown v-model="state.status" id="status" :options="options" @choose="loadOrders" />
 
     <BaseTable :fields="orderfields" :items="orders">
         <template #cell(picture)="{ item }">
@@ -42,7 +42,7 @@ const state = reactive({
     status: 'All',
 })
 
-const options = ['All', 'Finished', 'Not Finished', 'cancel'];
+const options = ['All', 'Finished', 'Not finished', 'cancel'];
 const orderfields = [
     { key: 'OID', sortable: false },
     { key: 'status', sortable: false },
@@ -80,7 +80,11 @@ const cancelOrder = async (item) => {
 
 const loadOrders = async () => {
     try {
-        const response = await axios.get(`/getorder/${userStore.account}`);
+        const response = await axios.post('/getorder', {
+            account: userStore.account,
+            status: state.status,
+        });
+
         orders.value = response.data;
     }
     catch (error) {
