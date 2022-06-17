@@ -1,28 +1,30 @@
 <template>
-  <table>
-    <thead>
-      <tr>
-        <th v-for="(field, index) in fields" :key="index" :class="{ 'clickable': field.sortable }"
-          @click="handleClick(field)">
-          {{ getTitle(field.key) }}
-          <IconSortable v-if="field.sortable" :status="status[field.key]"></IconSortable>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(item, index) in items" :key="index">
-        <td v-for="field in fields">
-          <slot :name="`cell(${field.key})`" :item="item">
-            {{ item[field.key] }}
-          </slot>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th v-for="(field, index) in fields" :key="index" :class="{ 'clickable': field.sortable }"
+            @click="handleClick(field)">
+            {{ getTitle(field.key) }}
+            <IconSortable v-if="field.sortable" :status="status[field.key]"></IconSortable>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, index) in items" :key="index">
+          <td v-for="field in fields">
+            <slot :name="`cell(${field.key})`" :item="item">
+              {{ item[field.key] }}
+            </slot>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import IconSortable from './icons/IconSortable.vue';
 
 const props = defineProps({
@@ -76,47 +78,55 @@ const handleClick = (field) => {
 <style scoped lang="scss">
 @import "@/styles/global.scss";
 
-table {
-  border-radius: 4px;
-  width: 75%;
-  border-collapse: collapse;
+.table-container {
+  display: block;
+  overflow: auto;
+  width: calc(100% - 2rem);
+  margin-top: 5%;
 
-  thead {
-    tr {
-      background: var(--gray-color);
+  table {
+    border-radius: 4px;
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0;
 
-      th {
-        text-align: center;
-        cursor: default;
+    thead {
+      tr {
+        background: var(--gray-color);
 
-        &.clickable {
-          cursor: pointer;
-        }
-      }
-    }
-  }
+        th {
+          text-align: center;
+          cursor: default;
 
-  tbody {
-    tr {
-      background: var(--lightgray-color);
-
-      td {
-        text-align: center;
-
-        button {
-          background: var(--info-color);
-          color: var(--white-color);
-          border: none;
-          padding: 20px 30px;
-          border-radius: 5px;
-          cursor: pointer;
+          &.clickable {
+            cursor: pointer;
+          }
         }
       }
     }
 
-    input {
-      width: 65px;
-      text-align: center;
+    tbody {
+      tr {
+        background: var(--lightgray-color);
+
+        td {
+          text-align: center;
+
+          button {
+            background: var(--info-color);
+            color: var(--white-color);
+            border: none;
+            padding: 20px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+          }
+        }
+      }
+
+      input {
+        width: 65px;
+        text-align: center;
+      }
     }
   }
 }

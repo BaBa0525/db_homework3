@@ -108,10 +108,12 @@ def getTransaction():
     account = request.json['account']
     action = request.json['action']
 
+    shopname = User.query.get(account).shopname
+
     if action == 'All':
-        transaction = Transaction.query.filter(db.or_(Transaction.account==account, Transaction.trader==account))
+        transaction = Transaction.query.filter(Transaction.account==account)
     else:
-        transaction = Transaction.query.filter(db.or_(Transaction.account==account, Transaction.trader==account), Transaction.action==action)
+        transaction = Transaction.query.filter(Transaction.account==account, Transaction.action==action)
 
     if transaction is None:
         return ERROR_USER_NOT_EXISTS
