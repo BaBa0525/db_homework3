@@ -1,17 +1,18 @@
 <template>
   <div v-if="userStore.isOwner">
-    <BaseDropDown v-model="state.status" id="status" :options="options" @choose="loadOrders" />
+    <div class="base-container">
+      <BaseDropDown v-model="state.status" id="status" :options="options" @choose="loadOrders" />
 
-    <BaseTable :fields="orderfields" :items="orders">
-      <template #cell(detail)="{ item }">
-        <button type="button" @click="showDetail(item)">Order Details</button>
-      </template>
-      <template #cell(action)="{ item }">
-        <button type="button" v-if="item.status === 'Not finished'" @click="finishOrder(item)">Finish</button>
-        <button type="button" v-if="item.status === 'Not finished'" @click="cancelOrder(item)">Cancel</button>
-      </template>
-    </BaseTable>
-
+      <BaseTable :fields="orderfields" :items="orders">
+        <template #cell(detail)="{ item }">
+          <button type="button" @click="showDetail(item)">Order Details</button>
+        </template>
+        <template #cell(action)="{ item }">
+          <button type="button" v-if="item.status === 'Not finished'" @click="finishOrder(item)">Finish</button>
+          <button type="button" v-if="item.status === 'Not finished'" @click="cancelOrder(item)">Cancel</button>
+        </template>
+      </BaseTable>
+    </div>
     <PopupModal :show="popupDetail.active" titles="Order" @close-popup="popupDetail.active = false">
       <BaseTable :fields="popupFields" :items="popupDetail.orderDetail">
         <template #cell(picture)="{ item }">
@@ -177,5 +178,10 @@ button {
     opacity: 0.6;
     cursor: not-allowed;
   }
+}
+
+.base-container {
+  @include flex;
+  align-items: flex-start;
 }
 </style>
