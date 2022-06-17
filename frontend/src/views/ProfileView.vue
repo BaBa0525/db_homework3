@@ -1,42 +1,45 @@
 <template>
-<div class="container">
-    <IconHead/> <br/>
+    <div class="container">
+        <IconHead /> <br />
 
-<ul>
-    <li>account: {{userStore.account}} </li>
-    <li>phone number: {{userStore.phone}}</li>
-    <li>location: {{userStore.latitude}}, {{userStore.longitude}}</li>
-    <button @click="active.location = true">Change location</button>
-    <li>wallet balance: ${{userStore.balance}}</li>
-    <button @click="active.balance = true">Recharge</button>
-</ul>
-    <PopupModal :show="active.location" titles="Update location" @close-popup="closePopup">
-    <ul>
-        <li>Current latitude: {{userStore.latitude}}</li>
-        <li>Current longitude: {{userStore.longitude}}</li>
-    </ul>
-        <BaseInput v-model="location_state.newLatitude" placeholder="new latitude" :hasError="v_location$.newLatitude.$error"
-      :errors="v_location$.newLatitude.$errors" id="newLatitude" type="text" @blur="v_location$.newLatitude.$touch" />
-        <br/>
-        <BaseInput v-model="location_state.newLongitude" placeholder="new longitude" :hasError="v_location$.newLongitude.$error"
-      :errors="v_location$.newLongitude.$errors" id="newLongitude" type="text" @blur="v_location$.newLongitude.$touch" />
-        <button :disabled="v_location$.$error || v_location$.$errors.length" @click="handleLocation">Update</button>
-    </PopupModal>
+        <ul>
+            <li>account: {{ userStore.account }} </li>
+            <li>phone number: {{ userStore.phone }}</li>
+            <li>location: {{ userStore.latitude }}, {{ userStore.longitude }}</li>
+            <button @click="active.location = true">Change location</button>
+            <li>wallet balance: ${{ userStore.balance }}</li>
+            <button @click="active.balance = true">Recharge</button>
+        </ul>
+        <PopupModal :show="active.location" titles="Update location" @close-popup="closePopup">
+            <ul>
+                <li>Current latitude: {{ userStore.latitude }}</li>
+                <li>Current longitude: {{ userStore.longitude }}</li>
+            </ul>
+            <BaseInput v-model="location_state.newLatitude" placeholder="new latitude"
+                :hasError="v_location$.newLatitude.$error" :errors="v_location$.newLatitude.$errors" id="newLatitude"
+                type="text" @blur="v_location$.newLatitude.$touch" />
+            <br />
+            <BaseInput v-model="location_state.newLongitude" placeholder="new longitude"
+                :hasError="v_location$.newLongitude.$error" :errors="v_location$.newLongitude.$errors" id="newLongitude"
+                type="text" @blur="v_location$.newLongitude.$touch" />
+            <button :disabled="v_location$.$error || v_location$.$errors.length" @click="handleLocation">Update</button>
+        </PopupModal>
 
-    <PopupModal :show="active.balance" titles="Recharge" @close-popup="closePopup">
-        <h1>Current balence: {{userStore.balance}}</h1>
-        <BaseInput v-model="balance_state.addValue" placeholder="enter add value" :hasError="v_balance$.addValue.$error"
-      :errors="v_balance$.addValue.$errors" id="addValue" type="text" @blur="v_balance$.addValue.$touch" />
-        <button :disabled="v_balance$.$error || v_balance$.$errors.length" @click="handleRecharge">Charge</button>
-    </PopupModal>
-</div>
+        <PopupModal :show="active.balance" titles="Recharge" @close-popup="closePopup">
+            <h1>Current balence: {{ userStore.balance }}</h1>
+            <BaseInput v-model="balance_state.addValue" placeholder="enter add value"
+                :hasError="v_balance$.addValue.$error" :errors="v_balance$.addValue.$errors" id="addValue" type="text"
+                @blur="v_balance$.addValue.$touch" />
+            <button :disabled="v_balance$.$error || v_balance$.$errors.length" @click="handleRecharge">Charge</button>
+        </PopupModal>
+    </div>
 
 </template>
 
 <script setup>
 import { ref, reactive, computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
-import { required, decimal, integer, minValue, maxValue } from '@vuelidate/validators';
+import { required, decimal, integer, minValue, maxValue, helpers } from '@vuelidate/validators';
 import { useUserStore } from '../stores/user';
 import IconHead from '../components/icons/IconHead.vue'
 import PopupModal from '../components/PopupModal.vue';
@@ -66,7 +69,7 @@ const balance_rules = computed(() => ({
     addValue: {
         required,
         integer,
-        nonNegative: minValue(0),
+        positive: helpers.withMessage('Value should be positive', minValue(1)),
         // nonNegative: helpers.withMessage('baba', minValue(0)),
     }
 }));

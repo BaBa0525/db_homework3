@@ -310,8 +310,7 @@ const isOrderEmpty = computed(() => {
 @import "@/styles/global.scss";
 
 .form-container {
-  position: absolute;
-  top: 5%;
+  margin-top: 5%;
 }
 
 button {

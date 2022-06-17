@@ -5,7 +5,7 @@
 
       <BaseTable :fields="orderfields" :items="orders">
         <template #cell(select)="{ item }">
-            <input type="checkbox" v-if="item.status === 'Not finished'" v-model="item.checked" />
+          <input type="checkbox" v-if="item.status === 'Not finished'" v-model="item.checked" />
         </template>
         <template #cell(total_price)="{ item }">
           ${{ item.subtotal + item.deliverFee }}
@@ -60,7 +60,7 @@ const state = reactive({
 
 const options = ['All', 'Finished', 'Not finished', 'Cancelled'];
 const orderfields = [
-  { key: 'select', sortable: false},
+  { key: 'select', sortable: false },
   { key: 'OID', sortable: false },
   { key: 'status', sortable: false },
   { key: 'startTime', sortable: false },
@@ -90,15 +90,15 @@ const showDetail = async (item) => {
 
 const haschecked = computed(() => (orders.value.filter((food) => (food.checked)).length > 0))
 
-const cancelOrder = async (item = null) => {   
-  try{
+const cancelOrder = async (item = null) => {
+  try {
     const checkedorder = orders.value.filter((food) => (food.checked)).map((order) => (order.OID));
     await axios.post('/cancelorder', {
       orderIDs: (item === null) ? checkedorder : [item.OID],
     });
     await loadOrders();
     alert("cancel successfully")
-  } catch(error){
+  } catch (error) {
     alert(error.response.data.message);
   }
 }
@@ -111,7 +111,7 @@ const loadOrders = async () => {
     });
 
     orders.value = response.data;
-    for(const order of orders.value){
+    for (const order of orders.value) {
       order.checked = false;
     }
   }
@@ -153,11 +153,11 @@ const finishOrder = async (item = null) => {
   try {
     const checkedorder = orders.value.filter((food) => (food.checked)).map((order) => (order.OID));
     await axios.post('/finishorder', {
-    orderIDs: (item === null) ? checkedorder : [item.OID],
+      orderIDs: (item === null) ? checkedorder : [item.OID],
     })
     alert('Finish Order Successfully!');
   }
-  catch {
+  catch (error) {
     alert(error.response.data.message);
   }
 

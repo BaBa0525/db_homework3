@@ -18,10 +18,20 @@ def cancelOrder():
    
     # orderData = cancelOrderByIDList(orderIDList)
     with db.session.begin():
+        time = datetime.now()
+
         for orderID in orderIDList:
             orderData = Order.query.filter_by(OID=orderID)
             orderDetails = OrderDetail.query.filter_by(OID=orderID)
             transactions = Transaction.query.filter_by(OID=orderID)
+
+            order = orderData.first()
+            if order.status == 'Finished':
+                db.session.rollback()
+                return ({ 'message': 'The orders could not be cancelled. (status: Finished)' }, BAD_REQUEST)
+            elif order.status == 'Cancelled':
+                db.session.rollback()
+                return ({ 'message': 'The orders could not be cancelled. (status: Cancelled)' }, BAD_REQUEST)
 
             for detail in orderDetails.all():
                 mealQuery = Meal.query.filter_by(shopname=detail.shopname, name=detail.mealname)
@@ -33,8 +43,11 @@ def cancelOrder():
                 user = userQuery.first()
                 userQuery.update({ 'balance': user.balance + (-1 * transaction.amount) })
 
+                action = 'Receive' if transaction.action == 'Payment' else 'Payment'
+                newTransaction = Transaction(None, transaction.account, transaction.trader, transaction.traderRole, action, time, -1 * transaction.amount)
+                db.session.add(newTransaction)
+
             orderData.update({ 'status': 'Cancelled', 'endTime': datetime.now()})
-            transactions.delete()
 
     return orderSchema.jsonify(orderData)
 
@@ -126,6 +139,10 @@ def createOrder():
         owner = ownerQuery.first()
         ownerQuery.update({ 'balance': owner.balance + totalCost })
 
+        '''
+        1. customer pay to shop
+        2. owner receive from customer
+        '''
         userTransaction = Transaction(orderData.OID, user.account, shopname, 'shop', 'Payment', time, -1 * totalCost)
         ownerTransaction = Transaction(orderData.OID, owner.account, user.account, 'user', 'Receive', time, totalCost)
         db.session.add_all([userTransaction, ownerTransaction])
@@ -141,7 +158,16 @@ def finishOrder():
     with db.session.begin():
         for orderID in orderIDList:
             orderQuery = Order.query.filter_by(OID=orderID)
-            orderQuery.update({ 'status': 'Finished', 'endTime': datetime.now()})
+
+            order = orderQuery.first()
+            if order.status == 'Finished':
+                db.session.rollback()
+                return ({ 'message': 'The orders could not be finished. (status: Finished)' }, BAD_REQUEST)
+            elif order.status == 'Cancelled':
+                db.session.rollback()
+                return ({ 'message': 'The orders could not be cancelled. (status: Cancelled)' }, BAD_REQUEST)
+
+            orderQuery.update({ 'status': 'Finished', 'endTime': datetime.now() })
 
     return orderSchema.jsonify(orderQuery)
         

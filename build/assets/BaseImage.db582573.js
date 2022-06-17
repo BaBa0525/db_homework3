@@ -1,0 +1,1 @@
+import{_ as a,o as r,v as _,N as s,O as o}from"./index.7aec1e25.js";const t={};function c(e,n){return r(),_("img",s(o(e.$attrs)),null,16)}var l=a(t,[["render",c],["__scopeId","data-v-619c4336"]]);export{l as B};

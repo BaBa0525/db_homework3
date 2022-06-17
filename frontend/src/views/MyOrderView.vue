@@ -1,23 +1,28 @@
 <template>
+  <div class="container">
     <BaseDropDown v-model="state.status" id="status" :options="options" @choose="loadOrders" />
 
     <BaseTable :fields="orderfields" :items="orders">
-        <template #cell(select)="{ item }">
-            <input type="checkbox" v-if="item.status === 'Not finished'" v-model="item.checked" />
-        </template>
-        <template #cell(picture)="{ item }">
-            <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
-        </template>
-        <template #cell(detail)="{ item }">
-            <button type="button" @click="showDetail(item)">Order Details</button>
-        </template>
-        <template #cell(action)="{ item }">
-            <button type="button" v-if="item.status === 'Not finished'" @click="cancelOrder(item)">Cancel</button>
-        </template>
+      <template #cell(select)="{ item }">
+        <input type="checkbox" v-if="item.status === 'Not finished'" v-model="item.checked" />
+      </template>
+      <template #cell(picture)="{ item }">
+        <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
+      </template>
+      <template #cell(total_price)="{ item }">
+        ${{ item.subtotal + item.deliverFee }}
+      </template>
+      <template #cell(detail)="{ item }">
+        <button type="button" @click="showDetail(item)">Order Details</button>
+      </template>
+      <template #cell(action)="{ item }">
+        <button type="button" v-if="item.status === 'Not finished'" @click="cancelOrder(item)">Cancel</button>
+      </template>
     </BaseTable>
     <button type="button" v-if="haschecked" @click="cancelOrder()">cancel</button>
-    <PopupModal :show="popupDetail.active" titles="Order" @close-popup="popupDetail.active = false">
+  </div>
 
+  <PopupModal :show="popupDetail.active" titles="Order" @close-popup="popupDetail.active = false">
     <BaseTable :fields="popupFields" :items="popupDetail.orderDetail">
       <template #cell(picture)="{ item }">
         <BaseImage :src="item.image" :alt="item.name" width="100" height="100"></BaseImage>
@@ -47,15 +52,15 @@ const state = reactive({
 
 const options = ['All', 'Finished', 'Not finished', 'Cancelled'];
 const orderfields = [
-    { key: 'select', sortable: false},
-    { key: 'OID', sortable: false },
-    { key: 'status', sortable: false },
-    { key: 'startTime', sortable: false },
-    { key: 'endTime', sortable: false },
-    { key: 'shopname', sortable: false },
-    { key: 'subtotal', sortable: false },
-    { key: 'detail', sortable: false },
-    { key: 'action', sortable: false },
+  { key: 'select', sortable: false },
+  { key: 'OID', sortable: false },
+  { key: 'status', sortable: false },
+  { key: 'startTime', sortable: false },
+  { key: 'endTime', sortable: false },
+  { key: 'shopname', sortable: false },
+  { key: 'total_price', sortable: false },
+  { key: 'detail', sortable: false },
+  { key: 'action', sortable: false },
 ];
 
 const orders = ref([]);
@@ -77,34 +82,34 @@ const showDetail = async (item) => {
 
 const haschecked = computed(() => (orders.value.filter((food) => (food.checked)).length > 0))
 
-const cancelOrder = async (item = null) => {   
-  try{
+const cancelOrder = async (item = null) => {
+  try {
     const checkedorder = orders.value.filter((food) => (food.checked)).map((order) => (order.OID));
     await axios.post('/cancelorder', {
       orderIDs: (item === null) ? checkedorder : [item.OID],
     });
-    await loadOrders();
-    alert("cancel successfully")
-  } catch(error){
+    alert("Cancel successfully")
+  } catch (error) {
     alert(error.response.data.message);
   }
+  await loadOrders();
 }
 
 const loadOrders = async () => {
-    try {
-        const response = await axios.post('/getorder', {
-            account: userStore.account,
-            status: state.status,
-        });
+  try {
+    const response = await axios.post('/getorder', {
+      account: userStore.account,
+      status: state.status,
+    });
 
-        orders.value = response.data;
-        for(const order of orders.value){
-            order.checked = false;
-        }
+    orders.value = response.data;
+    for (const order of orders.value) {
+      order.checked = false;
     }
-    catch (error) {
-        console.log(error);
-    }
+  }
+  catch (error) {
+    console.log(error);
+  }
 }
 
 loadOrders();
@@ -157,7 +162,7 @@ button {
 }
 
 .container {
-    @include flex;
-    align-items: flex-start;
+  @include flex;
+  align-items: flex-start;
 }
 </style>
