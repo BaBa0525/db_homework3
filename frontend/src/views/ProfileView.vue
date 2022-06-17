@@ -1,40 +1,43 @@
 <template>
-<div class="container">
-    <IconHead/> <br/>
+    <div class="container">
+        <IconHead /> <br />
 
-<ul>
-    <li>account: {{userStore.account}} </li>
-    <li>phone number: {{userStore.phone}}</li>
-    <li>location: {{userStore.latitude}}, {{userStore.longitude}}</li>
-    <button @click="active.location = true">Change location</button>
-    <li>wallet balance: ${{userStore.balance}}</li>
-    <button @click="active.balance = true">Recharge</button>
-</ul>
-    <PopupModal :show="active.location" titles="Update location" @close-popup="closePopup">
-    <ul>
-        <li>Current latitude: {{userStore.latitude}}</li>
-        <li>Current longitude: {{userStore.longitude}}</li>
-    </ul>
-        <BaseInput v-model="location_state.newLatitude" placeholder="new latitude" :hasError="v_location$.newLatitude.$error"
-      :errors="v_location$.newLatitude.$errors" id="newLatitude" type="text" @blur="v_location$.newLatitude.$touch" />
-        <br/>
-        <BaseInput v-model="location_state.newLongitude" placeholder="new longitude" :hasError="v_location$.newLongitude.$error"
-      :errors="v_location$.newLongitude.$errors" id="newLongitude" type="text" @blur="v_location$.newLongitude.$touch" />
-        <button @click="handleLocation">Update</button>
-    </PopupModal>
+        <ul>
+            <li>Account: {{ userStore.account }} </li>
+            <li>Phone Number: {{ userStore.phone }}</li>
+            <li>Location: {{ userStore.latitude }}, {{ userStore.longitude }}</li>
+            <button @click="active.location = true">Change location</button>
+            <li>Wallet Balance: ${{ userStore.balance }}</li>
+            <button @click="active.balance = true">Recharge</button>
+        </ul>
+        <PopupModal :show="active.location" titles="Update location" @close-popup="closePopup">
+            <ul>
+                <li>Current Latitude: {{ userStore.latitude }}</li>
+                <li>Current Longitude: {{ userStore.longitude }}</li>
+            </ul>
+            <BaseInput v-model="location_state.newLatitude" placeholder="new latitude"
+                :hasError="v_location$.newLatitude.$error" :errors="v_location$.newLatitude.$errors" id="newLatitude"
+                type="text" @blur="v_location$.newLatitude.$touch" />
+            <br />
+            <BaseInput v-model="location_state.newLongitude" placeholder="new longitude"
+                :hasError="v_location$.newLongitude.$error" :errors="v_location$.newLongitude.$errors" id="newLongitude"
+                type="text" @blur="v_location$.newLongitude.$touch" />
+            <button @click="handleLocation">Update</button>
+        </PopupModal>
 
-    <PopupModal :show="active.balance" titles="Recharge" @close-popup="closePopup">
-        <h1>Current balence: {{userStore.balance}}</h1>
-        <BaseInput v-model="balance_state.addValue" placeholder="enter add value" :hasError="v_balance$.addValue.$error"
-      :errors="v_balance$.addValue.$errors" id="addValue" type="text" @blur="v_balance$.addValue.$touch" />
-        <button @click="handleRecharge">Charge</button>
-    </PopupModal>
-</div>
+        <PopupModal :show="active.balance" titles="Recharge" @close-popup="closePopup">
+            <h1>Current balence: {{ userStore.balance }}</h1>
+            <BaseInput v-model="balance_state.addValue" placeholder="enter add value"
+                :hasError="v_balance$.addValue.$error" :errors="v_balance$.addValue.$errors" id="addValue" type="text"
+                @blur="v_balance$.addValue.$touch" />
+            <button @click="handleRecharge">Charge</button>
+        </PopupModal>
+    </div>
 
 </template>
 
 <script setup>
-import { ref, reactive,computed } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, decimal, minValue, maxValue } from '@vuelidate/validators';
 import { useUserStore } from '../stores/user';
@@ -100,47 +103,47 @@ const closePopup = () => {
 }
 
 const handleLocation = async () => {
-  try {
+    try {
 
-    await axios.put('/location', {
-        account: userStore.account,
-        latitude: location_state.newLatitude,
-        longitude: location_state.newLongitude
-    });
-    
-    await userStore.reload();
-    alert('Update succeed!');
+        await axios.put('/location', {
+            account: userStore.account,
+            latitude: location_state.newLatitude,
+            longitude: location_state.newLongitude
+        });
 
-  } catch (error) {
-    console.log(error);
-    alert('Update fail!');
-  }
-  closePopup();
+        await userStore.reload();
+        alert('Update succeed!');
+
+    } catch (error) {
+        console.log(error);
+        alert('Update fail!');
+    }
+    closePopup();
 }
 
 const handleRecharge = async () => {
-  try {
+    try {
 
-    await axios.patch('/recharge', {
-        account: userStore.account,
-        value: balance_state.addValue
-    });
-    
-    await userStore.reload();
-    alert('Recharge succeed!');
+        await axios.patch('/recharge', {
+            account: userStore.account,
+            value: balance_state.addValue
+        });
 
-  } catch (error) {
-    console.log(error);
-    alert('Recharge fail!');
-  }
-  closePopup();
+        await userStore.reload();
+        alert('Recharge succeed!');
+
+    } catch (error) {
+        console.log(error);
+        alert('Recharge fail!');
+    }
+    closePopup();
 }
 </script>
 
 <style scoped lang="scss">
 @import "@/styles/global.scss";
 
-.container{
+.container {
     @include flex;
     justify-content: center;
     align-items: center;
@@ -149,6 +152,7 @@ const handleRecharge = async () => {
         list-style: none;
         font-size: 2rem;
         font-weight: 600;
+
         li {
             margin-top: 1rem;
         }
@@ -170,5 +174,4 @@ const handleRecharge = async () => {
         }
     }
 }
-
 </style>
