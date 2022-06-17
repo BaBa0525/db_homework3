@@ -105,13 +105,16 @@ def createOrder():
             db.session.add(Detail)
 
             mealData = Meal.query.filter_by(name=mealName, shopname=shopname)
-            
+
+            if mealData.first() is None:
+                db.session.rollback()
+                return ({ 'message': 'Meal not exist.' }, BAD_REQUEST)
+
             if (modifiedQuantity := mealData.first().quantity - mealQuantity) < 0:
                 db.session.rollback()
                 return ({ 'message': 'Not enough meal quantity.' }, BAD_REQUEST)
 
             mealData.update({ 'quantity': modifiedQuantity })
-
 
         if (modifiedUserBalance := user.balance - totalCost) < 0:
             db.session.rollback()

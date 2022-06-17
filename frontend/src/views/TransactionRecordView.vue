@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <BaseDropDown v-model="state.action" id="action" :options="options" @change="loadTransactions" />
+    <BaseDropDown v-model="state.action" id="action" :options="options" @choose="loadTransactions" />
     <BaseTable :fields="fields" :items="state.transaction">
       <template #cell(amount_change)="{ item }">
         {{ item.amount }}
@@ -43,7 +43,7 @@ const loadTransactions = async () => {
       action: state.action,
     });
     state.transaction = response.data;
-
+    
   } catch (error) {
     console.log(error);
   }
